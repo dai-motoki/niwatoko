@@ -8,7 +8,7 @@ import niwatoko
 @click.command()
 @click.argument('file_path', type=click.Path(exists=True), required=False)
 @click.option('-m', '--model', type=click.Choice(['openai', 'claude']), default='claude', help='使用するモデルを選択します。')
-@click.option('-o', '--output', default=os.path.dirname(niwatoko.__file__) + "/output.py", type=click.Path(), help='生成されたコードの出力先ファイルを指定します。')
+@click.option('-o', '--output', type=click.Path(), help='生成されたコードの出力先ファイルを指定します。')
 @click.option('-v', '--version',  is_flag=True, help='バージョン情報を表示します。')
 
 def main(file_path, model, output, version):
@@ -61,6 +61,12 @@ def main(file_path, model, output, version):
         
         if input(f"生成されたコードを {output} に書き出しました。実行しますか？(y/n)\n").lower() == "y":
             subprocess.run(["python", output])
+    else:
+        print("生成されたコードの保存先が指定されていないため、自動実行します。")
+        output = os.path.dirname(niwatoko.__file__) + "/temp.py"
+        with open(output, 'w', encoding = "utf-8") as file:
+            file.write(generated_code)
+        subprocess.run(["python", output])
 
 
 
