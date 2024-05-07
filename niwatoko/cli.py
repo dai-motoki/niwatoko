@@ -1,6 +1,6 @@
+import subprocess
 import click
 import os
-import openai
 from niwatoko.foundation_model.interpretation.llm.claude import generate_response
 from niwatoko.foundation_model.interpretation.llm.gpt import generate_response as gpt_generate_response
 import niwatoko
@@ -33,6 +33,10 @@ def main(file_path, model, output, version):
 
     with open(file_path, 'r', encoding = "utf-8") as file:
         natural_language_code = file.read()
+    
+    prompt = f"{natural_language_code}"
+    print(natural_language_code)
+    print("=================================")
 
     if model == 'openai':
         generated_code = gpt_generate_response(
@@ -42,9 +46,6 @@ def main(file_path, model, output, version):
             temperature=0.5,
         )
     elif model == 'claude':
-        prompt = f"{natural_language_code}"
-        print(natural_language_code)
-        print("=================================")
         generated_code = generate_response(
             model='claude-3-sonnet-20240229',
             prompt=prompt,
@@ -57,7 +58,10 @@ def main(file_path, model, output, version):
     if output:
         with open(output, 'w', encoding = "utf-8") as file:
             file.write(generated_code)
-            print(f"生成されたコードを {output} に書き出しました。")
+        
+        if input(f"生成されたコードを {output} に書き出しました。実行しますか？(y/n)\n").lower() == "y":
+            subprocess.run(["python", output])
+
 
 
 #     match = re.search(r'version=[\'\"](.+?)[\'\"]', content)
