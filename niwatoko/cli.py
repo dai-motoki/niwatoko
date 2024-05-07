@@ -9,6 +9,15 @@ from niwatoko.foundation_model.interpretation.llm.gpt import generate_response a
 @click.option('-m', '--model', type=click.Choice(['openai', 'claude']), default='openai', help='使用するモデルを選択します。')
 @click.option('-o', '--output', type=click.Path(), help='生成されたコードの出力先ファイルを指定します。')
 @click.option('-v', '--version', is_flag=True, help='バージョン情報を表示します。')
+
+def get_version():
+    with open('setup.py', 'r') as file:
+        content = file.read()
+    start = content.find('version="') + 9
+    end = content.find('",', start)
+    version = content[start:end]
+    return version
+
 def main(file_path, model, output, version):
     """
     自然言語のソースコードを読み込んで実行するコマンドラインインターフェース。
