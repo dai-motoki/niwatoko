@@ -1,25 +1,36 @@
-# はい、ご要望の内容を踏まえて、niwatoko - 自然言語プログラミング言語のPythonパッケージの要件定義書を作成しました。主な内容は以下の通りです:
-# 
-# 1. **目的**: niwatoko は自然言語でプログラミングを行うことができる新しいプログラミング言語で、このプロジェクトの目的は、niwatoko のPythonパッケージを開発し、ユーザーが自然言語を使ってプログラムを記述し、実行できるようにすることです。
-# 
-# 2. **パッケージの基本構造**: パッケージの構成は、`niwatoko/`ディレクトリ以下に、`parser.py`、`interpreter.py`、`foundation_model/`ディレクトリなどが含まれる形になっています。
-# 
-# 3. **setup.pyの書き方**: パッケージのメタデータ、依存ライブラリの指定、インストール方法などを定義しています。
-# 
-# 4. **__init__.pyの役割**: パッケージのバージョン情報の定義と、公開APIの`import`を行っています。
-# 
-# 5. **README.mdの書き方**: パッケージの概要、インストール方法、使用方法、ライセンス、貢献方法、サポート方法などを記載しています。
-# 
-# 6. **LICENSEファイル**: オープンソースライセンスの選択と、ライセンス条文の記述について説明しています。
-# 
-# 7. **パッケージのバージョン管理**: セマンティックバージョニングに基づいて、MAJOR.MINOR.PATCH形式でバージョンを管理する方法を示しています。
-# 
-# 8. **テストの書き方**: テストファイルの命名規則、テストクラスの定義方法、テストメソッドの命名規則、アサーション、カバレッジ測定、CLI操作のテストなどについて説明しています。
-# 
-# 9. **ドキュメントの作成方法**: Sphinxを使用してドキュメントを作成する方法を示しています。
-# 
-# 10. **Docker化とCI/CDの設定**: Dockerイメージのビルドと、GitHub Actionsを使ったCI/CDパイプラインの設定方法を説明しています。
-# 
-# 11. **WebアプリケーションのUI設定**: StreamlitやGradioを使ってWebアプリケーションのUIを設定する方法について示しています。
-# 
-# 以上が、niwatoko - 自然言語プログラミング言語のPythonパッケージの要件定義書の主な内容です。ご確認ください。
+import os
+from openai import OpenAI
+client = OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY")
+)
+with open("niwatoko/grammar/system.md", "r") as f:
+    system_prompt = f.read()
+
+def generate_response(model, prompt, max_tokens, temperature):
+    """
+    OpenAI APIを使用してプロンプトに対する応答を生成する関数。
+
+    Args:
+        model (str): 使用するGPTモデルの名前（例: "gpt-4", "gpt-4-turbo"）。
+        prompt (str): 応答を生成するためのプロンプト。
+        max_tokens (int): 生成する最大トークン数。
+        temperature (float): 生成時のランダム性を制御する温度パラメータ（0から1の範囲）。
+
+    Returns:
+        str: 生成された応答テキスト。
+    """
+
+    model = "gpt-4-turbo-2024-04-09"
+
+
+    chat_completion = client.chat.completions.create(
+        model=model,
+        max_tokens=max_tokens,
+        temperature=temperature,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt}
+        ]
+    )
+
+    return chat_completion.choices[0].message.content.strip()

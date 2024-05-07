@@ -2,6 +2,7 @@ import click
 import os
 import openai
 from niwatoko.foundation_model.interpretation.llm.claude import generate_response
+from niwatoko.foundation_model.interpretation.llm.gpt import generate_response as gpt_generate_response
 
 @click.command()
 @click.argument('file_path', type=click.Path(exists=True))
@@ -20,17 +21,12 @@ def main(file_path, model, output):
         natural_language_code = file.read()
 
     if model == 'openai':
-        openai.api_key = os.getenv("OPENAI_API_KEY")
-        prompt = f"{natural_language_code}"
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=prompt,
-            max_tokens=100,
-            n=1,
-            stop=None,
+        generated_code = gpt_generate_response(
+            model="gpt-4-turbo-2024-04-09",
+            prompt=natural_language_code,
+            max_tokens=1000,
             temperature=0.5,
         )
-        generated_code = response.choices[0].text.strip()
     elif model == 'claude':
         prompt = f"{natural_language_code}"
         print(natural_language_code)
@@ -38,8 +34,6 @@ def main(file_path, model, output):
         generated_code = generate_response(
             # model='claude-3-haiku-20240307',
             model='claude-3-sonnet-20240229',
-            # claude-3-sonnet-20240229
-            # claude-3-haiku-20240307
             # claude-3-opus-20240229
             prompt=prompt,
             max_tokens=4000,
