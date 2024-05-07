@@ -1,13 +1,13 @@
 import os
 from openai import OpenAI
 import niwatoko 
+niwatoko_dir = os.path.dirname(niwatoko.__file__)                        # zoltraakパッケージのディレクトリパスを取得
+with open(f"{niwatoko_dir}/grammar/system.md", "r") as f:
+    system_prompt = f.read()
 client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY")
 )
 
-niwatoko_dir = os.path.dirname(niwatoko.__file__)                        # zoltraakパッケージのディレクトリパスを取得
-with open(f"{niwatoko_dir}/grammar/system.md", "r") as f:
-    system_prompt = f.read()
 
 def generate_response(model, prompt, max_tokens, temperature):
     """
