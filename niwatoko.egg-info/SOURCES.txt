@@ -1,6 +1,8 @@
 LICENSE
 README.md
 setup.py
+niwatoko/__init__.py
+niwatoko/cli.py
 niwatoko.egg-info/PKG-INFO
 niwatoko.egg-info/SOURCES.txt
 niwatoko.egg-info/dependency_links.txt

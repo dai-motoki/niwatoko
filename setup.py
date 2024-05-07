@@ -1,6 +1,3 @@
-# niwatoko - 自然言語プログラミング言語のPythonパッケージのsetup.pyファイルです。
-# このファイルはパッケージのインストールや配布に必要な情報を含んでいます。
-
 from setuptools import setup, find_packages
 
 setup(
@@ -15,8 +12,9 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-        'streamlit',
-        'gradio'
+        'click',
+        'openai',
+        'anthropic',
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
@@ -36,5 +34,8 @@ setup(
         'console_scripts': [
             'niwatoko=niwatoko.cli:main',
         ],
+    },
+    package_data={
+        'niwatoko': ['foundation_model/*'],
     },
 )

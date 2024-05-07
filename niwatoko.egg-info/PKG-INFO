@@ -19,6 +19,9 @@ Classifier: Operating System :: OS Independent
 Requires-Python: >=3.7
 Description-Content-Type: text/markdown
 License-File: LICENSE
+Requires-Dist: click
+Requires-Dist: openai
+Requires-Dist: anthropic
 
 # 要件定義書: niwatoko - 自然言語プログラミング言語のPythonパッケージ
 
