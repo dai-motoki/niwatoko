@@ -65,7 +65,7 @@ def main(file_path, model, output, version):
         print("生成されたコードの保存先が指定されていないため、自動実行します。")
         output = os.path.dirname(niwatoko.__file__) + "/temp.py"
         with open(output, 'w', encoding = "utf-8") as file:
-            file.write(generated_code)
+            file.write(generated_code.replace("`","").replace("python",""))
         subprocess.run(["python", output])
 
 
