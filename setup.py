@@ -17,6 +17,8 @@ setup(
     install_requires=[
         'streamlit',
         'gradio'
+        'openai',
+        'anthropic',
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
@@ -36,5 +38,8 @@ setup(
         'console_scripts': [
             'niwatoko=niwatoko.cli:main',
         ],
+    },
+    package_data={
+        'niwatoko': ['foundation_model/*'],
     },
 )
