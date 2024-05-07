@@ -8,7 +8,7 @@ import niwatoko
 @click.command()
 @click.argument('file_path', type=click.Path(exists=True), required=False)
 @click.option('-m', '--model', type=click.Choice(['openai', 'claude']), default='claude', help='使用するモデルを選択します。')
-@click.option('-o', '--output', default=os.path.dirname(niwatoko.__file__) + "/output.md", type=click.Path(), help='生成されたコードの出力先ファイルを指定します。')
+@click.option('-o', '--output', default=os.path.dirname(niwatoko.__file__) + "/output.py", type=click.Path(), help='生成されたコードの出力先ファイルを指定します。')
 @click.option('-v', '--version',  is_flag=True, help='バージョン情報を表示します。')
 
 def main(file_path, model, output, version):
