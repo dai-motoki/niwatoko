@@ -54,8 +54,11 @@ def test_generate_response_claude(tmp_path):
     sample_file.write_text('自然言語のコードサンプル')
     output_file = tmp_path / 'output.py'
 
+
     runner = CliRunner()
-    result = runner.invoke(main, [str(sample_file), '--model', 'claude', '--output', str(output_file)])
+    result = runner.invoke(main, [str(sample_file), '--model', 'claude', '--output', str(output_file)], input='n\n')
+    assert '生成されたコードを' in result.output
+    assert f'{str(output_file)} に書き出しました。実行しますか？(y/n)' in result.output
     assert result.exit_code == 0
     assert os.path.exists(output_file)
     assert 'に書き出しました。' in result.output
@@ -69,7 +72,9 @@ def test_generate_response_openai(tmp_path):
     output_file = tmp_path / 'output.py'
 
     runner = CliRunner()
-    result = runner.invoke(main, [str(sample_file), '--model', 'openai', '--output', str(output_file)])
+    result = runner.invoke(main, [str(sample_file), '--model', 'claude', '--output', str(output_file)], input='n\n')
+    assert '生成されたコードを' in result.output
+    assert f'{str(output_file)} に書き出しました。実行しますか？(y/n)' in result.output
     assert result.exit_code == 0
     assert os.path.exists(output_file)
     assert 'に書き出しました。' in result.output
