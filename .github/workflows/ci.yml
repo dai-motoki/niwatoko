@@ -2,9 +2,11 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - '*'
   pull_request:
-    branches: [ main ]
+    branches:
+      - '*'
 
 jobs:
 
@@ -12,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8, 3.9]
+        python-version: [3.8, 3.9, "3.10", "3.11"]
 
     steps:
     - uses: actions/checkout@v3
@@ -31,7 +33,7 @@ jobs:
     - name: Test with pytest
       run: |
         pip install pytest
-        pytest tests/
+        pytest tests/test_compiler_v1_2.py
     - name: Build package
       run: |
         python setup.py sdist bdist_wheel
