@@ -27,6 +27,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install -e .
     - name: Test with pytest
+      env:                                                                  # --- 環境変数の設定
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}   
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}         # OpenAI APIキーを環境変数として設定
       run: |
         pip install pytest
         pytest tests/test_compiler_v1_2.py
