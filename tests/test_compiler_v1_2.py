@@ -46,38 +46,33 @@ def test_invalid_model():
     assert result.exit_code == 2                                              # - 実行結果のexitコードが1であることを確認
     assert 'Error: Invalid value for' in result.output              # - 出力にエラーメッセージが含まれていることを確認
 
-def test_generate_response_claude(tmp_path):
-    """
-    Claudeモデルを使用して自然言語コードから生成されたコードを確認するテストケース
-    """
-    sample_file = tmp_path / 'sample.md'
-    sample_file.write_text('自然言語のコードサンプル')
-    output_file = tmp_path / 'output.py'
+class TestGenerateResponse:
+    def setup_method(self, tmp_path):
+        self.sample_file = tmp_path / 'sample.md'
+        self.sample_file.write_text('自然言語のコードサンプル')
+        self.output_file = tmp_path / 'output.py'
+        self.runner = CliRunner()
 
+    def assert_common(self, result):
+        assert '生成されたコードを' in result.output
+        assert f'{str(self.output_file)} に書き出しました。実行しますか？(y/n)' in result.output
+        assert result.exit_code == 0
+        assert os.path.exists(self.output_file)
+        assert 'に書き出しました。' in result.output
 
-    runner = CliRunner()
-    result = runner.invoke(main, [str(sample_file), '--model', 'claude', '--output', str(output_file)], input='n\n')
-    assert '生成されたコードを' in result.output
-    assert f'{str(output_file)} に書き出しました。実行しますか？(y/n)' in result.output
-    assert result.exit_code == 0
-    assert os.path.exists(output_file)
-    assert 'に書き出しました。' in result.output
+    def test_generate_response_claude(self, tmp_path):
+        """
+        Claudeモデルを使用して自然言語コードから生成されたコードを確認するテストケース
+        """
+        result = self.runner.invoke(main, [str(self.sample_file), '--model', 'claude', '--output', str(self.output_file)], input='n\n')
+        self.assert_common(result)
 
-def test_generate_response_openai(tmp_path):
-    """
-    OpenAIモデルを使用して自然言語コードから生成されたコードを確認するテストケース
-    """
-    sample_file = tmp_path / 'sample.md'
-    sample_file.write_text('自然言語のコードサンプル')
-    output_file = tmp_path / 'output.py'
-
-    runner = CliRunner()
-    result = runner.invoke(main, [str(sample_file), '--model', 'claude', '--output', str(output_file)], input='n\n')
-    assert '生成されたコードを' in result.output
-    assert f'{str(output_file)} に書き出しました。実行しますか？(y/n)' in result.output
-    assert result.exit_code == 0
-    assert os.path.exists(output_file)
-    assert 'に書き出しました。' in result.output
+    def test_generate_response_openai(self, tmp_path):
+        """
+        OpenAIモデルを使用して自然言語コードから生成されたコードを確認するテストケース
+        """
+        result = self.runner.invoke(main, [str(self.sample_file), '--model', 'openai', '--output', str(self.output_file)], input='n\n')
+        self.assert_common(result)
 # ```
 
 # 解説
