@@ -1,8 +1,12 @@
 import os
 import anthropic
 import niwatoko 
+
+from dotenv import load_dotenv
+
+load_dotenv()  # .envファイルから環境変数を読み込む
 niwatoko_dir = os.path.dirname(niwatoko.__file__)                        # zoltraakパッケージのディレクトリパスを取得
-with open(f"{niwatoko_dir}/grammar/system.md", "r") as f:
+with open(f"{niwatoko_dir}/grammar/system.md", "r", encoding = "utf-8") as f:
     system_prompt = f.read()
 
 def generate_response(model, prompt, max_tokens, temperature):
