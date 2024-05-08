@@ -1,6 +1,23 @@
-import subprocess
+### 実装計画:
+1. pytest や unittest を用いたテストケースの作成
+2. CLIコマンドごとの動作確認テスト
+3. エラーハンドリングのテストケース追加
+4. CI/CDパイプラインへの組み込み
+
+プロジェクトの構成部分としてCLI機能が正しく動作することが重要です。CLIテストコードを実装することで、以下の利点があります:
+- 実装されたCLI機能の動作確認
+- 将来的な機能追加や修正に向けた信頼性の向上
+- バージョンアップ時の回帰テストの自動化
+
+
+このイシューの完了により、安定したCLI操作が保証され、ユーザー体験が改善されます。
+
+### 該当部分は以下、以下を検証したい。
+
+
 import click
 import os
+import openai
 from niwatoko.foundation_model.interpretation.llm.claude import generate_response
 from niwatoko.foundation_model.interpretation.llm.gpt import generate_response as gpt_generate_response
 import niwatoko
@@ -31,14 +48,8 @@ def main(file_path, model, output, version):
         print("ファイルパスが指定されていません。")
         return
 
-
-    with open(file_path, 'r', encoding = "utf-8") as file:
-
+    with open(file_path, 'r') as file:
         natural_language_code = file.read()
-    
-    prompt = f"{natural_language_code}"
-    print(natural_language_code)
-    print("=================================")
 
     if model == 'openai':
         generated_code = gpt_generate_response(
@@ -48,6 +59,9 @@ def main(file_path, model, output, version):
             temperature=0.5,
         )
     elif model == 'claude':
+        prompt = f"{natural_language_code}"
+        print(natural_language_code)
+        print("=================================")
         generated_code = generate_response(
             model='claude-3-sonnet-20240229',
             prompt=prompt,
@@ -58,26 +72,42 @@ def main(file_path, model, output, version):
         raise ValueError(f"無効なモデル: {model}")
 
     if output:
-        with open(output, 'w', encoding = "utf-8") as file:
+        with open(output, 'w') as file:
             file.write(generated_code)
-        
-        if input(f"生成されたコードを {output} に書き出しました。実行しますか？(y/n)\n").lower() == "y":
-            subprocess.run(["python", output])
-    else:
-        print("生成されたコードの保存先が指定されていないため、自動実行します。")
-        output = os.path.dirname(niwatoko.__file__) + "/temp.py"
-        with open(output, 'w', encoding = "utf-8") as file:
-            file.write(generated_code.replace("`","").replace("python",""))
-        subprocess.run(["python", output])
+            print(f"生成されたコードを {output} に書き出しました。")
 
 
 
-#     match = re.search(r'version=[\'\"](.+?)[\'\"]', content)
-#     if match:
-#         version = match.group(1)
-#     else:
-#         raise ValueError("バージョン情報が見つかりませんでした。")
 
-#     return version
+## 実行
+
+pytestコードを記述すること
+os を利用して niwatokoコマンドのCLIでのテストを行うこと
+niwatoko sample.md
+
+あと、1つ1つ確認できるように全てのテストは細かく関数にすること
+とか
+
+出力先はpythonファイルです。
+
+解説はコメントアウト
+
+## チェック
+
+解説
+```
+`code`
+```
+解説
+
+
+これは
+
+コードブロック絶対入れるな
+`code`
+コードブロック絶対入れるな
+# 解説 （コメントアウトでかけ）
+
+で出力
 
 
