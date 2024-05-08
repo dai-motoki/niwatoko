@@ -1,3 +1,20 @@
+### 実装計画:
+1. pytest や unittest を用いたテストケースの作成
+2. CLIコマンドごとの動作確認テスト
+3. エラーハンドリングのテストケース追加
+4. CI/CDパイプラインへの組み込み
+
+プロジェクトの構成部分としてCLI機能が正しく動作することが重要です。CLIテストコードを実装することで、以下の利点があります:
+- 実装されたCLI機能の動作確認
+- 将来的な機能追加や修正に向けた信頼性の向上
+- バージョンアップ時の回帰テストの自動化
+
+
+このイシューの完了により、安定したCLI操作が保証され、ユーザー体験が改善されます。
+
+### 該当部分は以下、以下を検証したい。
+
+
 import click
 import os
 import openai
@@ -52,13 +69,45 @@ def main(file_path, model, output, version):
             temperature=0.2,
         )
     else:
-        print(f"無効なモデルが指定されました: {model}")
-        print("有効なモデル: 'openai', 'claude'")
-        return
+        raise ValueError(f"無効なモデル: {model}")
 
     if output:
         with open(output, 'w') as file:
             file.write(generated_code)
             print(f"生成されたコードを {output} に書き出しました。")
+
+
+
+
+## 実行
+
+pytestコードを記述すること
+os を利用して niwatokoコマンドのCLIでのテストを行うこと
+niwatoko sample.md
+
+あと、1つ1つ確認できるように全てのテストは細かく関数にすること
+とか
+
+出力先はpythonファイルです。
+
+解説はコメントアウト
+
+## チェック
+
+解説
+```
+`code`
+```
+解説
+
+
+これは
+
+コードブロック絶対入れるな
+`code`
+コードブロック絶対入れるな
+# 解説 （コメントアウトでかけ）
+
+で出力
 
 
