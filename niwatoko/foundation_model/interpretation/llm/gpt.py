@@ -1,8 +1,11 @@
 import os
 from openai import OpenAI
 import niwatoko 
+from dotenv import load_dotenv
+
+load_dotenv()  # .envファイルから環境変数を読み込む
 niwatoko_dir = os.path.dirname(niwatoko.__file__)                        # zoltraakパッケージのディレクトリパスを取得
-with open(f"{niwatoko_dir}/grammar/system.md", "r") as f:
+with open(f"{niwatoko_dir}/grammar/system.md", "r", encoding = "utf-8") as f:
     system_prompt = f.read()
 client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY")

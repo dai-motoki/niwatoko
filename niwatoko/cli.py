@@ -1,6 +1,6 @@
+import subprocess
 import click
 import os
-import openai
 from niwatoko.foundation_model.interpretation.llm.claude import generate_response
 from niwatoko.foundation_model.interpretation.llm.gpt import generate_response as gpt_generate_response
 import niwatoko
@@ -31,8 +31,14 @@ def main(file_path, model, output, version):
         print("ファイルパスが指定されていません。")
         return
 
-    with open(file_path, 'r') as file:
+
+    with open(file_path, 'r', encoding = "utf-8") as file:
+
         natural_language_code = file.read()
+    
+    prompt = f"{natural_language_code}"
+    print(natural_language_code)
+    print("=================================")
 
     if model == 'openai':
         generated_code = gpt_generate_response(
@@ -42,9 +48,6 @@ def main(file_path, model, output, version):
             temperature=0.5,
         )
     elif model == 'claude':
-        prompt = f"{natural_language_code}"
-        print(natural_language_code)
-        print("=================================")
         generated_code = generate_response(
             model='claude-3-sonnet-20240229',
             prompt=prompt,
@@ -52,13 +55,29 @@ def main(file_path, model, output, version):
             temperature=0.2,
         )
     else:
-        print(f"無効なモデルが指定されました: {model}")
-        print("有効なモデル: 'openai', 'claude'")
-        return
+        raise ValueError(f"無効なモデル: {model}")
 
     if output:
-        with open(output, 'w') as file:
+        with open(output, 'w', encoding = "utf-8") as file:
             file.write(generated_code)
-            print(f"生成されたコードを {output} に書き出しました。")
+        
+        if input(f"生成されたコードを {output} に書き出しました。実行しますか？(y/n)\n").lower() == "y":
+            subprocess.run(["python", output])
+    else:
+        print("生成されたコードの保存先が指定されていないため、自動実行します。")
+        output = os.path.dirname(niwatoko.__file__) + "/temp.py"
+        with open(output, 'w', encoding = "utf-8") as file:
+            file.write(generated_code.replace("`","").replace("python",""))
+        subprocess.run(["python", output])
+
+
+
+#     match = re.search(r'version=[\'\"](.+?)[\'\"]', content)
+#     if match:
+#         version = match.group(1)
+#     else:
+#         raise ValueError("バージョン情報が見つかりませんでした。")
+
+#     return version
 
 
