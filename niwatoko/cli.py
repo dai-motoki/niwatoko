@@ -4,6 +4,7 @@ import os
 from niwatoko.foundation_model.interpretation.llm.claude import generate_response
 from niwatoko.foundation_model.interpretation.llm.gpt import generate_response as gpt_generate_response
 import niwatoko
+import re
 
 @click.command()
 @click.argument('file_path', type=click.Path(exists=True), required=False)
@@ -31,19 +32,18 @@ def main(file_path, model, output, version):
         print("ファイルパスが指定されていません。")
         return
 
+    # input_file = 'niwatoko.md'
+    # output_file = '全体ファイル.md'
 
-    with open(file_path, 'r', encoding = "utf-8") as file:
+    processed_content = process_imports(file_path)
 
-        natural_language_code = file.read()
-    
-    prompt = f"{natural_language_code}"
-    print(natural_language_code)
-    print("=================================")
+
+    print(processed_content)
 
     if model == 'openai':
         generated_code = gpt_generate_response(
             model="gpt-4-turbo-2024-04-09",
-            prompt=natural_language_code,
+            prompt=processed_content,
             max_tokens=1000,
             temperature=0.5,
         )
@@ -51,7 +51,7 @@ def main(file_path, model, output, version):
         generated_code = generate_response(
             # model='claude-3-sonnet-20240229',
             model='claude-3-haiku-20240307',
-            prompt=prompt,
+            prompt=processed_content,
             max_tokens=4000,
             temperature=0.2,
         )
@@ -72,13 +72,63 @@ def main(file_path, model, output, version):
         subprocess.run(["python", output])
 
 
+import os
 
-#     match = re.search(r'version=[\'\"](.+?)[\'\"]', content)
-#     if match:
-#         version = match.group(1)
-#     else:
-#         raise ValueError("バージョン情報が見つかりませんでした。")
+def process_imports(file_path):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+    
+    output = []
+    for line in lines:
+        print(f"Processing line: {line.strip()}")  # デバッグ用のprint
+        if line.startswith('- '):
+            parts = line.strip().split(' = ')
+            if len(parts) == 2:
+                import_path = parts[1].strip()
+                if import_path.startswith('md ['):
+                    import_path = import_path[4:-1] + '.md'  # 拡張子を追加
+                    print(f"Importing markdown file: {import_path}")  # デバッグ用のprint
+                    import_content = get_file_content(import_path)
+                    output.append(line)
+                    output.append('```\n')
+                    output.append(import_content)
+                    output.append('```\n')
+                elif import_path.startswith('py ['):
+                    import_path = import_path[4:-1] + '.py'  # 拡張子を追加
+                    print(f"Importing Python file: {import_path}")  # デバッグ用のprint
+                    import_content = get_file_content(import_path)
+                    output.append(line)
+                    output.append('```python\n')
+                    output.append(import_content)
+                    output.append('```\n')
+                else:
+                    print(f"Unsupported import type: {import_path}")  # デバッグ用のprint
+                    output.append(line)
+            else:
+                print(f"Invalid import statement: {line.strip()}")  # デバッグ用のprint
+                output.append(line)
+        else:
+            print(f"Regular line: {line.strip()}")  # デバッグ用のprint
+            output.append(line)
+    
+    print("Processed content:")  # デバッグ用のprint
+    print(''.join(output))  # デバッグ用のprint
+    
+    return ''.join(output)
 
-#     return version
+def get_file_content(file_path):
+    if os.path.isfile(file_path):
+        with open(file_path, 'r') as file:
+            return file.read()
+    else:
+        print(f"File not found: {file_path}")  # デバッグ用のprint
+        return f"ファイルが見つかりません: {file_path}"
 
+# # 使用例
+# input_file = 'niwatoko.md'
+# output_file = '全体ファイル.md'
 
+# processed_content = process_imports(input_file)
+
+# with open(output_file, 'w') as file:
+#     file.write(processed_content)
