@@ -261,7 +261,7 @@ Vercelを使ってSphinxドキュメントを公開する手順は以下の通�
 
 1. Sphinxプロジェクトをビルドする
 ```bash
-$ make html
+sphinx-build -b html . _build/html && open _build/html/index.html
 ```
 
 2. Vercel用の設定ファイル `vercel.json` をプロジェクトルートに作成する
