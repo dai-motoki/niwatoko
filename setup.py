@@ -3,6 +3,11 @@
 
 from setuptools import setup, find_packages
 
+
+def _requires_from_file(filename):
+    return open(filename).read().splitlines()
+
+
 setup(
     name='niwatoko',
     version='1.1.3',
@@ -14,12 +19,7 @@ setup(
     url='https://niwatoko2.vercel.app/',
     packages=find_packages(),
     include_package_data=True,
-    install_requires=[
-        'streamlit',
-        'gradio',
-        'openai',
-        'anthropic',
-    ],
+    install_requires=_requires_from_file('requirements.txt'),
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
@@ -41,7 +41,7 @@ setup(
     },
     package_data={
         '': ['*.txt', '*.md', '*.json', '*.csv', '*.yaml', '*.yml'],
-        'niwatoko': ['foundation_model/interpretation/llm/*', 
+        'niwatoko': ['foundation_model/interpretation/llm/*',
                      'grammar/*'],
     },
 )

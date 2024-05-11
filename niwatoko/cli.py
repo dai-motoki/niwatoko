@@ -1,22 +1,19 @@
-import subprocess
 import click
 import os
-from niwatoko.foundation_model.interpretation.llm.claude import generate_response
-from niwatoko.foundation_model.interpretation.llm.gpt import generate_response as gpt_generate_response
-import niwatoko
-import re
-from tqdm import tqdm
+from .foundation_model.interpretation.llm.claude import generate_response
+from .foundation_model.interpretation.llm.gpt import generate_response as gpt_generate_response
+from ._version import __version__
 import itertools
 import threading
 import sys
 import time
+
 
 @click.command()
 @click.argument('file_path', type=click.Path(exists=True), required=False)
 @click.option('-m', '--model', type=click.Choice(['openai', 'claude']), default='claude', help='使用するモデルを選択します。')
 @click.option('-o', '--output', type=click.Path(), help='生成されたコードの出力先ファイルを指定します。')
 @click.option('-v', '--version',  is_flag=True, help='バージョン情報を表示します。')
-
 def main(file_path, model, output, version):
     """
     自然言語のソースコードを読み込んで実行するコマンドラインインターフェース。
@@ -29,7 +26,7 @@ def main(file_path, model, output, version):
     """
     if version:
         try:
-            print(f"niwatoko version: {niwatoko.__version__}")
+            print(f"niwatoko version: {__version__}")
         except AttributeError:
             print("バージョン情報がniwatokoモジュールに存在しません。")
         return
@@ -68,9 +65,10 @@ def main(file_path, model, output, version):
     spinner.join()
 
     if output:
-        with open(output, 'w', encoding = "utf-8") as file:
+        with open(output, 'w', encoding="utf-8") as file:
             file.write(generated_code)
             print(f"\n生成されたコードを {output} に書き出しました。")
+
 
 def spin(done):
     """
@@ -87,11 +85,11 @@ def spin(done):
         time.sleep(0.1)
     sys.stdout.write('\rDone!     \n')
 
-import os
+
 def process_imports(file_path):
     with open(file_path, 'r') as file:
         lines = file.readlines()
-    
+
     output = []
     for line in lines:
         if line.startswith('- '):
@@ -100,7 +98,8 @@ def process_imports(file_path):
                 import_path = parts[1].strip()
                 if '[' in import_path and not import_path.startswith('['):
                     # ブラケットで囲まれたパスを抽出
-                    path_within_brackets = import_path[import_path.index('[') + 1:import_path.index(']')]
+                    path_within_brackets = import_path[import_path.index(
+                        '[') + 1:import_path.index(']')]
                     # 拡張子を取得
                     extension = path_within_brackets.split('.')[-1]
                     # print(extension)
@@ -116,13 +115,15 @@ def process_imports(file_path):
                         output.extend(process_other_import(import_path, line))
                 else:
                     # 拡張子が指定されていない場合、新しい関数を使用して処理
-                    output.extend(process_no_extension_import(import_path, line))
+                    output.extend(
+                        process_no_extension_import(import_path, line))
             else:
                 output.append(line)
         else:
             output.append(line)
-    
+
     return ''.join(output)
+
 
 def process_no_extension_import(import_path, line):
     """
@@ -157,6 +158,7 @@ def process_md_import(import_path, line):
     import_content = get_file_content(import_path)
     return [line, '```\n', import_content, '```\n']
 
+
 def process_py_import(import_path, line):
     """
     Pythonファイルのインポートを処理する関数
@@ -171,6 +173,7 @@ def process_py_import(import_path, line):
     import_path = import_path[4:-1] + '.py'  # 拡張子を追加
     import_content = get_file_content(import_path)
     return [line, '```python\n', import_content, '```\n']
+
 
 def process_rst_import(import_path, line):
     """
@@ -187,6 +190,7 @@ def process_rst_import(import_path, line):
     import_content = get_file_content(import_path)
     return [line, '```rst\n', import_content, '```\n']
 
+
 def process_other_import(import_path, line):
     """
     md, py, rst以外の拡張子のインポートを処理する関数
@@ -198,10 +202,16 @@ def process_other_import(import_path, line):
     Returns:
         list: 処理後の出力行のリスト
     """
-    extension = import_path.split('[')[0].strip()  # 文字列の一番左から [ の一文字前までを拡張子として取得
-    import_path = import_path.split('[')[1].split(']')[0].strip() + '.' + extension  # [ と ] の間にあるパスに拡張子を追加
+    extension = import_path.split(
+        '['
+    )[0].strip()  # 文字列の一番左から [ の一文字前までを拡張子として取得
+    import_path = import_path.split(
+        '['
+    )[1].split(']')[0].strip() + '.' + extension  # [ と ] の間にあるパスに拡張子を追加
     import_content = get_file_content(import_path)
     return [line, f'```{extension}\n', import_content, '```\n']
+
+
 def get_file_content(file_path):
     # print(file_path)
     if os.path.isfile(file_path):
@@ -211,4 +221,3 @@ def get_file_content(file_path):
         error_message = f"ファイルが見つかりません: {file_path}"
         # print(error_message)
         raise FileNotFoundError(error_message)
-
