@@ -39,7 +39,7 @@ def main(file_path, model, output, version):
 
     processed_content = process_imports(file_path)
 
-    print("実行中...")
+    print("実行中... (Processing...)")
 
     # ぐるぐるアニメーションを表示するスレッドを開始
     done = False
@@ -70,12 +70,12 @@ def main(file_path, model, output, version):
     if output:
         with open(output, 'w', encoding = "utf-8") as file:
             file.write(generated_code)
-            print(f"\n生成されたコードを {output} に書き出しました。")
+            print(f"生成されたコードを {output} に書き出しました。")
+            print(f"Generated code has been written to {output}.")
 
 def spin(done):
     """
     ぐるぐるアニメーションを表示する関数
-
     Args:
         done (function): アニメーションを停止するかどうかを判定する関数
     """

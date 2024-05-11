@@ -1,37 +1,71 @@
-以下のファイル一覧を確認しました:
+## 要件仕様書
 
-- `hello.py`: Python のソースコードファイル
-- `hello.md`: Markdown 形式のファイル
-- `hello.go`: Go 言語のソースコードファイル
-- `hello.rst`: reStructuredText 形式のファイル
+### 1. 加算モジュール (addition_py)
 
-各ファイルの内容は以下の通りです:
+#### 機能概要
+- 2つの数値を受け取り、その合計を返す関数を提供する。
+- 複数の数値のリストを受け取り、その合計を返す関数を提供する。
+- 可変長引数を受け取り、その合計を返す関数を提供する。
 
-`hello.py`:
-```python
-print("Hello World")
-```
+#### 関数仕様
+1. `add(a, b)`
+   - 機能: 2つの数値 `a` と `b` の合計を返す。
+   - 入力: `a` (int または float), `b` (int または float)
+   - 出力: `int` または `float` (合計)
 
-`hello.md`:
-```markdown
-# Hello World
-This is a Markdown file.
-```
+2. `add_list(numbers)`
+   - 機能: 数値のリスト `numbers` の合計を返す。
+   - 入力: `numbers` (list of int または float)
+   - 出力: `int` または `float` (合計)
 
-`hello.go`:
-```go
-package main
-import "fmt"
+3. `add_multiple(*args)`
+   - 機能: 可変長引数 `*args` の合計を返す。
+   - 入力: `*args` (可変長の int または float 引数)
+   - 出力: `int` または `float` (合計)
 
-func main() {
-    fmt.Println("Hello World")
-}
-```
+#### テスト仕様
+1. 正常系テスト
+   - 整数の加算
+   - 浮動小数点数の加算
+   - 空のリストの加算
+   - 単一の数値の加算
+   - 複数の数値の加算
 
-`hello.rst`:
-```rst
-Hello World
-============
+2. 異常系テスト
+   - 文字列の入力
+   - `None` の入力
 
-This is a reStructuredText file.
-```
+### 2. 乗算モジュール (multiplication_py)
+
+#### 機能概要
+- 2つの数値を受け取り、その積を返す関数を提供する。
+- 複数の数値のリストを受け取り、その積を返す関数を提供する。
+- 可変長引数を受け取り、その積を返す関数を提供する。
+
+#### 関数仕様
+1. `multiply(a, b)`
+   - 機能: 2つの数値 `a` と `b` の積を返す。
+   - 入力: `a` (int または float), `b` (int または float)
+   - 出力: `int` または `float` (積)
+
+2. `multiply_list(numbers)`
+   - 機能: 数値のリスト `numbers` の積を返す。
+   - 入力: `numbers` (list of int または float)
+   - 出力: `int` または `float` (積)
+
+3. `multiply_multiple(*args)`
+   - 機能: 可変長引数 `*args` の積を返す。
+   - 入力: `*args` (可変長の int または float 引数)
+   - 出力: `int` または `float` (積)
+
+#### テスト仕様
+1. 正常系テスト
+   - 整数の乗算
+   - 浮動小数点数の乗算
+   - 空のリストの乗算
+   - 単一の数値の乗算
+   - 複数の数値の乗算
+
+2. 異常系テスト
+   - 文字列の入力
+   - `None` の入力
