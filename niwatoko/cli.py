@@ -98,22 +98,16 @@ def process_imports(file_path):
             parts = line.strip().split(' = ')
             if len(parts) == 2:
                 import_path = parts[1].strip()
+                print("import_path:", import_path)
                 if import_path.startswith('md ['):
-                    import_path = import_path[4:-1] + '.md'  # 拡張子を追加
-                    import_content = get_file_content(import_path)
-                    output.append(line)
-                    output.append('```\n')
-                    output.append(import_content)
-                    output.append('```\n')
+                    output.extend(process_md_import(import_path, line))
                 elif import_path.startswith('py ['):
-                    import_path = import_path[4:-1] + '.py'  # 拡張子を追加
-                    import_content = get_file_content(import_path)
-                    output.append(line)
-                    output.append('```python\n')
-                    output.append(import_content)
-                    output.append('```\n')
+                    output.extend(process_py_import(import_path, line))
+                elif import_path.startswith('rst ['):
+                    output.extend(process_rst_import(import_path, line))
                 else:
-                    output.append(line)
+                    # md, py, rst以外の拡張子の処理を追加
+                    output.extend(process_other_import(import_path, line))
             else:
                 output.append(line)
         else:
@@ -121,6 +115,66 @@ def process_imports(file_path):
     
     return ''.join(output)
 
+def process_md_import(import_path, line):
+    """
+    Markdownファイルのインポートを処理する関数
+
+    Args:
+        import_path (str): インポートするファイルのパス
+        line (str): インポート文の行
+
+    Returns:
+        list: 処理後の出力行のリスト
+    """
+    import_path = import_path[4:-1] + '.md'  # 拡張子を追加
+    import_content = get_file_content(import_path)
+    return [line, '```\n', import_content, '```\n']
+
+def process_py_import(import_path, line):
+    """
+    Pythonファイルのインポートを処理する関数
+
+    Args:
+        import_path (str): インポートするファイルのパス
+        line (str): インポート文の行
+
+    Returns:
+        list: 処理後の出力行のリスト
+    """
+    import_path = import_path[4:-1] + '.py'  # 拡張子を追加
+    import_content = get_file_content(import_path)
+    return [line, '```python\n', import_content, '```\n']
+
+def process_rst_import(import_path, line):
+    """
+    reStructuredTextファイルのインポートを処理する関数
+
+    Args:
+        import_path (str): インポートするファイルのパス
+        line (str): インポート文の行
+
+    Returns:
+        list: 処理後の出力行のリスト
+    """
+    import_path = import_path[5:-1] + '.rst'  # 拡張子を追加
+    import_content = get_file_content(import_path)
+    return [line, '```rst\n', import_content, '```\n']
+
+def process_other_import(import_path, line):
+    """
+    md, py, rst以外の拡張子のインポートを処理する関数
+
+    Args:
+        import_path (str): インポートするファイルのパス
+        line (str): インポート文の行
+
+    Returns:
+        list: 処理後の出力行のリスト
+    """
+    extension = import_path.split('[')[0].strip()  # 文字列の一番左から [ の一文字前までを拡張子として取得
+    import_path = import_path.split('[')[1].split(']')[0].strip() + '.' + extension  # [ と ] の間にあるパスに拡張子を追加
+    import_content = get_file_content(import_path)
+    return [line, f'```{extension}\n', import_content, '```\n']
 def get_file_content(file_path):
     if os.path.isfile(file_path):
         with open(file_path, 'r') as file:
