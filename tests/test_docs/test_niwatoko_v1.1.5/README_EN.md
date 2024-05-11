@@ -1,5 +1,3 @@
-Here is the English translation:
-
 # niwatoko v1.1.4
 
 The Niwatoko programming language has started to provide a module import feature (world's first*).
