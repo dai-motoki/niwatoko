@@ -1,12 +1,20 @@
 import os
 from openai import OpenAI
-import niwatoko 
 from dotenv import load_dotenv
 
 load_dotenv()  # .envファイルから環境変数を読み込む
-niwatoko_dir = os.path.dirname(niwatoko.__file__)                        # zoltraakパッケージのディレクトリパスを取得
-with open(f"{niwatoko_dir}/grammar/system.md", "r", encoding = "utf-8") as f:
+
+SYSTEM_MD_PATH = os.path.join(
+    os.path.dirname(__file__),
+    "..",
+    "..",
+    "..",
+    "grammar",
+    "system.md"
+)
+with open(SYSTEM_MD_PATH, "r", encoding="utf-8") as f:
     system_prompt = f.read()
+
 client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY")
 )
@@ -27,7 +35,6 @@ def generate_response(model, prompt, max_tokens, temperature):
     """
 
     model = "gpt-4-turbo-2024-04-09"
-
 
     chat_completion = client.chat.completions.create(
         model=model,
