@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='niwatoko',
-    version='1.0.11',
+    version='1.1.1',
     description='自然言語でプログラミングを行うことができる新しいプログラミング言語',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
