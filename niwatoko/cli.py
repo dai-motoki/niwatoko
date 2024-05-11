@@ -94,16 +94,17 @@ def process_imports(file_path):
     
     output = []
     for line in lines:
+        output.extend(process_variable_imports(line))
         if line.startswith('- '):
             parts = line.strip().split(' = ')
             if len(parts) == 2:
                 import_path = parts[1].strip()
+                print('import_path:', import_path)
                 if '[' in import_path and not import_path.startswith('['):
                     # ブラケットで囲まれたパスを抽出
                     path_within_brackets = import_path[import_path.index('[') + 1:import_path.index(']')]
                     # 拡張子を取得
                     extension = path_within_brackets.split('.')[-1]
-                    # print(extension)
                     # 拡張子に応じた処理を行う
                     if extension == 'md':
                         output.extend(process_md_import(import_path, line))
@@ -124,6 +125,29 @@ def process_imports(file_path):
     
     return ''.join(output)
 
+def process_variable_imports(line):
+    """
+    {{}}で囲まれた変数のインポートを処理する関数
+
+    Args:
+        line (str): ファイルの行
+
+    Returns:
+        list: 処理後の出力行のリスト
+    """
+    output = []
+    if '{{' in line and '}}' in line:
+        # {{ }} で囲まれた変数を抽出
+        variable = line[line.index('{{') + 2:line.index('}}')]
+        # print(variable)
+        # 変数名を小文字に変換し、拡張子.mdを追加
+        import_path = variable.lower() + '.md'
+        # 同一階層内のファイルの内容を取得
+        import_content = get_file_content(import_path)
+        output.extend([line, '```\n', import_content, '```\n'])
+    else:
+        output.append(line)
+    return output
 def process_no_extension_import(import_path, line):
     """
     Markdownファイルのインポートを処理する関数
