@@ -1,21 +1,20 @@
-あなたは今から日本語で本を書くことになります。以下の情報を参考にして、素晴らしい本を書き上げてください。
 
-本のトピック:
+Book Topic:
 <topic>
 {{BOOK_TOPIC}}
 </topic>
 
-まず、このトピックについてブレインストーミングを行い、本に含めるアイデアを<brainstorm>タグの中に書き出してください。
+First, brainstorm ideas related to this topic and write them inside the <brainstorm> tag.
 
-次に、本の概要が以下のように提示されています:
+Next, an outline for the book is provided as follows:
 <outline>
 {{BOOK_OUTLINE}}
 </outline>
 
-この概要に沿って、各項目を章や節に分けて本文を書き進めてください。<book>タグの中に本文全体を書いてください。
+Following this outline, write the main content of the book, dividing it into chapters and sections. Write the entire book content inside the <book> tag.
 
-文章を書く際は、日本語の文法、スペル、句読点に十分気をつけてください。読者に伝わりやすい、分かりやすい文章を心がけましょう。
+When writing the text, pay close attention to Japanese grammar, spelling, and punctuation. Aim for clear and easy-to-understand sentences for the reader.
 
-本文が完成したら、最後に推敲を行い、必要な修正を加えてください。章タイトルやセクションタイトルもわかりやすいものにしましょう。
+Once the main content is complete, proofread and make any necessary revisions. Ensure that the chapter titles and section titles are also clear and understandable.
 
-以上の点に気をつけて、素晴らしい本を完成させてください。がんばってください!
+With these points in mind, strive to create an excellent book. Good luck!

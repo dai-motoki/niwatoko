@@ -1,1 +1,1 @@
-西郷隆盛が生成AI時代に生きていたら
+If Saigo Takamori lived in the generative AI era
