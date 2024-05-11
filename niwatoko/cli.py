@@ -5,6 +5,11 @@ from niwatoko.foundation_model.interpretation.llm.claude import generate_respons
 from niwatoko.foundation_model.interpretation.llm.gpt import generate_response as gpt_generate_response
 import niwatoko
 import re
+from tqdm import tqdm
+import itertools
+import threading
+import sys
+import time
 
 @click.command()
 @click.argument('file_path', type=click.Path(exists=True), required=False)
@@ -32,13 +37,14 @@ def main(file_path, model, output, version):
         print("ファイルパスが指定されていません。")
         return
 
-    # input_file = 'niwatoko.md'
-    # output_file = '全体ファイル.md'
-
     processed_content = process_imports(file_path)
 
+    print("実行中...")
 
-    print(processed_content)
+    # ぐるぐるアニメーションを表示するスレッドを開始
+    done = False
+    spinner = threading.Thread(target=spin, args=(lambda: done,))
+    spinner.start()
 
     if model == 'openai':
         generated_code = gpt_generate_response(
@@ -49,7 +55,6 @@ def main(file_path, model, output, version):
         )
     elif model == 'claude':
         generated_code = generate_response(
-            # model='claude-3-sonnet-20240229',
             model='claude-3-haiku-20240307',
             prompt=processed_content,
             max_tokens=4000,
@@ -58,36 +63,43 @@ def main(file_path, model, output, version):
     else:
         raise ValueError(f"無効なモデル: {model}")
 
+    # ぐるぐるアニメーションを停止
+    done = True
+    spinner.join()
+
     if output:
         with open(output, 'w', encoding = "utf-8") as file:
             file.write(generated_code)
-        
-        if input(f"生成されたコードを {output} に書き出しました。実行しますか？(y/n)\n").lower() == "y":
-            subprocess.run(["python", output])
-    else:
-        print("生成されたコードの保存先が指定されていないため、自動実行します。")
-        output = os.path.dirname(niwatoko.__file__) + "/temp.py"
-        with open(output, 'w', encoding = "utf-8") as file:
-            file.write(generated_code.replace("`","").replace("python",""))
-        subprocess.run(["python", output])
+            print(f"\n生成されたコードを {output} に書き出しました。")
 
+def spin(done):
+    """
+    ぐるぐるアニメーションを表示する関数
+
+    Args:
+        done (function): アニメーションを停止するかどうかを判定する関数
+    """
+    for c in itertools.cycle(['|', '/', '-', '\\']):
+        if done():
+            break
+        sys.stdout.write(f'\r{c}')
+        sys.stdout.flush()
+        time.sleep(0.1)
+    sys.stdout.write('\rDone!     \n')
 
 import os
-
 def process_imports(file_path):
     with open(file_path, 'r') as file:
         lines = file.readlines()
     
     output = []
     for line in lines:
-        print(f"Processing line: {line.strip()}")  # デバッグ用のprint
         if line.startswith('- '):
             parts = line.strip().split(' = ')
             if len(parts) == 2:
                 import_path = parts[1].strip()
                 if import_path.startswith('md ['):
                     import_path = import_path[4:-1] + '.md'  # 拡張子を追加
-                    print(f"Importing markdown file: {import_path}")  # デバッグ用のprint
                     import_content = get_file_content(import_path)
                     output.append(line)
                     output.append('```\n')
@@ -95,24 +107,17 @@ def process_imports(file_path):
                     output.append('```\n')
                 elif import_path.startswith('py ['):
                     import_path = import_path[4:-1] + '.py'  # 拡張子を追加
-                    print(f"Importing Python file: {import_path}")  # デバッグ用のprint
                     import_content = get_file_content(import_path)
                     output.append(line)
                     output.append('```python\n')
                     output.append(import_content)
                     output.append('```\n')
                 else:
-                    print(f"Unsupported import type: {import_path}")  # デバッグ用のprint
                     output.append(line)
             else:
-                print(f"Invalid import statement: {line.strip()}")  # デバッグ用のprint
                 output.append(line)
         else:
-            print(f"Regular line: {line.strip()}")  # デバッグ用のprint
             output.append(line)
-    
-    print("Processed content:")  # デバッグ用のprint
-    print(''.join(output))  # デバッグ用のprint
     
     return ''.join(output)
 
@@ -121,14 +126,5 @@ def get_file_content(file_path):
         with open(file_path, 'r') as file:
             return file.read()
     else:
-        print(f"File not found: {file_path}")  # デバッグ用のprint
         return f"ファイルが見つかりません: {file_path}"
 
-# # 使用例
-# input_file = 'niwatoko.md'
-# output_file = '全体ファイル.md'
-
-# processed_content = process_imports(input_file)
-
-# with open(output_file, 'w') as file:
-#     file.write(processed_content)
