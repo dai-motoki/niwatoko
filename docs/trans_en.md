@@ -1,4 +1,5 @@
-<!-- - installation = rst [./installation] -->
-- usage = rst [./usage]
+- installation = rst [./installation]
+<!-- - `usage` = rst [./usage2] -->
+<!-- - `usage` = [./usage.rst] -->
 
-上記を英語に翻訳してください
+`usage`を英語に翻訳してください
