@@ -1,0 +1,33 @@
+- installation = html [./index]
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hello World</title>
+</head>
+<body>
+    <h1>Hello World!</h1>
+</body>
+</html>```
+
+The above code is an HTML file that displays the text "Hello World!" on a web page. Here's the English translation:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hello World</title>
+</head>
+<body>
+    <h1>Hello World!</h1>
+</body>
+</html>
+```
+
+The `<!DOCTYPE html>` declaration specifies that this is an HTML5 document. The `<html>` element is the root element of the HTML document, and it contains the `<head>` and `<body>` elements.
+
+The `<head>` element contains metadata about the web page, such as the title, which is set to "Hello World" in this case.
+
+The `<body>` element contains the visible content of the web page, which in this case is a single `<h1>` (heading 1) element with the text "Hello World!".
+
+When this HTML file is opened in a web browser, it will display the text "Hello World!" as the main heading on the page.
