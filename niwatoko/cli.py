@@ -98,22 +98,49 @@ def process_imports(file_path):
             parts = line.strip().split(' = ')
             if len(parts) == 2:
                 import_path = parts[1].strip()
-                print("import_path:", import_path)
-                if import_path.startswith('md ['):
-                    output.extend(process_md_import(import_path, line))
-                elif import_path.startswith('py ['):
-                    output.extend(process_py_import(import_path, line))
-                elif import_path.startswith('rst ['):
-                    output.extend(process_rst_import(import_path, line))
+                if '[' in import_path and not import_path.startswith('['):
+                    # ブラケットで囲まれたパスを抽出
+                    path_within_brackets = import_path[import_path.index('[') + 1:import_path.index(']')]
+                    # 拡張子を取得
+                    extension = path_within_brackets.split('.')[-1]
+                    print(extension)
+                    # 拡張子に応じた処理を行う
+                    if extension == 'md':
+                        output.extend(process_md_import(import_path, line))
+                    elif extension == 'py':
+                        output.extend(process_py_import(import_path, line))
+                    elif extension == 'rst':
+                        output.extend(process_rst_import(import_path, line))
+                    else:
+                        # その他の拡張子の場合
+                        output.extend(process_other_import(import_path, line))
                 else:
-                    # md, py, rst以外の拡張子の処理を追加
-                    output.extend(process_other_import(import_path, line))
+                    # 拡張子が指定されていない場合、新しい関数を使用して処理
+                    output.extend(process_no_extension_import(import_path, line))
             else:
                 output.append(line)
         else:
             output.append(line)
     
     return ''.join(output)
+
+def process_no_extension_import(import_path, line):
+    """
+    Markdownファイルのインポートを処理する関数
+
+    Args:
+        import_path (str): インポートするファイルのパス
+        line (str): インポート文の行
+
+    Returns:
+        list: 処理後の出力行のリスト
+    """
+    # print(import_path)
+    import_path = import_path[1:-1]
+    import_content = get_file_content(import_path)
+    # print(import_content)
+    return [line, '```\n', import_content, '```\n']
+
 
 def process_md_import(import_path, line):
     """
@@ -176,9 +203,12 @@ def process_other_import(import_path, line):
     import_content = get_file_content(import_path)
     return [line, f'```{extension}\n', import_content, '```\n']
 def get_file_content(file_path):
+    # print(file_path)
     if os.path.isfile(file_path):
         with open(file_path, 'r') as file:
             return file.read()
     else:
-        return f"ファイルが見つかりません: {file_path}"
+        error_message = f"ファイルが見つかりません: {file_path}"
+        # print(error_message)
+        raise FileNotFoundError(error_message)
 
