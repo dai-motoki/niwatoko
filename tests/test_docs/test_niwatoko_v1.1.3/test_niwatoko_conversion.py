@@ -3,8 +3,9 @@ import subprocess
 import os
 
 def test_niwatoko_conversion():
-    # Setup the test environment
-    os.chdir('tests/test_docs/test_niwatoko_v1.1.3')
+    # # Setup the test environment
+    
+    # os.chdir('./tests/test_docs/test_niwatoko_v1.1.3')
     
     # Remove the output file if it exists
     if os.path.exists('output.md'):
