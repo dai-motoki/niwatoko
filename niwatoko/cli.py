@@ -103,7 +103,7 @@ def process_imports(file_path):
                     path_within_brackets = import_path[import_path.index('[') + 1:import_path.index(']')]
                     # 拡張子を取得
                     extension = path_within_brackets.split('.')[-1]
-                    print(extension)
+                    # print(extension)
                     # 拡張子に応じた処理を行う
                     if extension == 'md':
                         output.extend(process_md_import(import_path, line))

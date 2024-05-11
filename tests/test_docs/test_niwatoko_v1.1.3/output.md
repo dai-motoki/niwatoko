@@ -1,9 +1,37 @@
-## ファイル一覧
+以下のファイル一覧を確認しました:
 
-### 説明ファイル
-- `hello.md`: Markdown形式のファイルで、"Hello World"というタイトルの下に"This is a Markdown file."と記述されています。
-- `hello.rst`: reStructuredText形式のファイルで、"Hello World"というタイトルの下に"This is a reStructuredText file."と記述されています。
+- `hello.py`: Python のソースコードファイル
+- `hello.md`: Markdown 形式のファイル
+- `hello.go`: Go 言語のソースコードファイル
+- `hello.rst`: reStructuredText 形式のファイル
 
-### プログラミングファイル
-- `hello.py`: Pythonのソースコードで、"Hello World"を出力するプログラムです。
-- `hello.go`: Goのソースコードで、"Hello World"を出力するプログラムです。
+各ファイルの内容は以下の通りです:
+
+`hello.py`:
+```python
+print("Hello World")
+```
+
+`hello.md`:
+```markdown
+# Hello World
+This is a Markdown file.
+```
+
+`hello.go`:
+```go
+package main
+import "fmt"
+
+func main() {
+    fmt.Println("Hello World")
+}
+```
+
+`hello.rst`:
+```rst
+Hello World
+============
+
+This is a reStructuredText file.
+```
