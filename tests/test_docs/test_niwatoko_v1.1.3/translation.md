@@ -1,23 +1,22 @@
-## 引用
+## Quotes
 
-- `翻訳対象言語集` = [./multilang.md]
-- `日本語ファイル` = [./README_ja.md]
+- `languages_to_translate` = [./multilang.md]
+- `japanese_file` = [./README_ja.md]
 
 ## 
 
 ```py
-import os
-`翻訳対象言語`から`対象言語`と`対処言語二文字表現`を1つずつ取り出す。
+From `languages_to_translate`, take one `target_language` and one `target_language_code`.
 
-    以下ファイルを作成
-    ```translation_{`対処言語二文字表現`}.md
-    `日本語ファイル`を`対象言語`に1行1行翻訳してください。
+    Create the following file:
+    ```translation_{`target_language_code`}.md
+    Translate `japanese_file` line by line into `target_language`.
     ```
 
-    以下コマンドを実行 os subprocess利用
+    Run the following command using os subprocess:
     ```
-    niwatoko translation.md -o README_{`対処言語二文字表現`}.md
+    niwatoko translation.md -o README_{`target_language_code`}.md
     ```
 
-`翻訳対象言語`を網羅するまでやる
+Repeat until all `languages_to_translate` are covered.
 ```

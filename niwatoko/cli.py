@@ -3,6 +3,7 @@ import click
 import os
 from niwatoko.foundation_model.interpretation.llm.claude import generate_response
 from niwatoko.foundation_model.interpretation.llm.gpt import generate_response as gpt_generate_response
+from niwatoko.foundation_model.interpretation.llm.gpt import generate_response_gpt4o as gpt_generate_response_gpt4o
 import niwatoko
 import re
 from tqdm import tqdm
@@ -13,11 +14,12 @@ import time
 
 @click.command()
 @click.argument('file_path', type=click.Path(exists=True), required=False)
-@click.option('-m', '--model', type=click.Choice(['openai', 'claude']), default='claude', help='使用するモデルを選択します。')
+@click.option('-m', '--model', type=click.Choice(['openai', 'openai-gpt4o', 'claude', 'claude-sonnet', 'claude-opus', 'claude-haiku']), default='claude-haiku', help='使用するモデルを選択します。')
 @click.option('-o', '--output', type=click.Path(), help='生成されたコードの出力先ファイルを指定します。')
 @click.option('-v', '--version',  is_flag=True, help='バージョン情報を表示します。')
 
 def main(file_path, model, output, version):
+    # print("file_path:", file_path)
     """
     自然言語のソースコードを読み込んで実行するコマンドラインインターフェース。
 
@@ -46,23 +48,34 @@ def main(file_path, model, output, version):
     spinner = threading.Thread(target=spin, args=(lambda: done,))
     spinner.start()
 
-    if model == 'openai':
+    if model == 'openai' or model == 'openai-gpt-turbo':
         generated_code = gpt_generate_response(
             model="gpt-4-turbo-2024-04-09",
             prompt=processed_content,
             max_tokens=1000,
             temperature=0.5,
         )
-    elif model == 'claude':
+    elif model == 'openai-gpt4o':
+        generated_code = gpt_generate_response_gpt4o(
+            prompt=processed_content,
+            max_tokens=2048,
+            temperature=0.5,
+        )
+    else:
+        if model == 'claude-sonnet':
+            claude_model = 'claude-3-sonnet-20240229'
+        elif model == 'claude-opus':
+            claude_model = 'claude-3-opus-20240229'
+        else:
+            claude_model = 'claude-3-haiku-20240307'  # デフォルトはhaiku
+        
+        print("model:", claude_model)
         generated_code = generate_response(
-            model='claude-3-haiku-20240307',
+            model=claude_model,
             prompt=processed_content,
             max_tokens=4000,
             temperature=0.2,
         )
-    else:
-        raise ValueError(f"無効なモデル: {model}")
-
     # ぐるぐるアニメーションを停止
     done = True
     spinner.join()

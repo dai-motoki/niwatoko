@@ -1,8 +1,8 @@
-## 引用
-- `足し算py` = py [./test_import_module_add]
-- `掛け算py` = py [./test_import_module_multiple]  
+## Quotes
+- `add_module` = [./test_import_module_add.py]
+- `multiply_module` = [./test_import_module_multiple.py]
 
 ## TODO
-`足し算py`と`掛け算py`を日本語のみの要件定義書にする。
-必要なテストに関しても記述をする。
+Create a requirements document in Japanese only for `add_module` and `multiply_module`.
+Also describe the necessary tests.
 

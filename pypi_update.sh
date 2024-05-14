@@ -1,2 +1,2 @@
 python setup.py sdist bdist_wheel
-twine upload dist/niwatoko-1.1.5*
+twine upload dist/niwatoko-1.1.7*
