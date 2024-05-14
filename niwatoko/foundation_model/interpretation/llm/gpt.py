@@ -40,3 +40,27 @@ def generate_response(model, prompt, max_tokens, temperature):
     )
 
     return chat_completion.choices[0].message.content.strip()
+
+def generate_response_gpt4o(prompt, max_tokens, temperature):
+    """
+    OpenAI APIを使用してGPT-4oモデルでプロンプトに対する応答を生成する関数。
+
+    Args:
+        prompt (str): 応答を生成するためのプロンプト。
+        max_tokens (int): 生成する最大トークン数。
+        temperature (float): 生成時のランダム性を制御する温度パラメータ（0から1の範囲）。
+
+    Returns:
+        str: 生成された応答テキスト。
+    """
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=temperature,
+        max_tokens=max_tokens,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )
+
+    return response.choices[0].message.content.strip()
