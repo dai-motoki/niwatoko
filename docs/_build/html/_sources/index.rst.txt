@@ -4,7 +4,9 @@
 
    requirements
    installation
+   installation_en
    usage
+   usage_en
    modules
    contributing
    authors
