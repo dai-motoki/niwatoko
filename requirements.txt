@@ -2,16 +2,16 @@
 # 
 # 要件定義書の内容を踏まえて、パッケージが依存する外部ライブラリを以下のように記載しました。
 # 
-install_requires=[
-    "numpy",
-    "nltk",
-    "tensorflow",
-    "torch",
-    "transformers",
-    "pillow",
-    "streamlit",
-    "gradio",
-]
+# install_requires=[
+#     "numpy",
+#     "nltk",
+#     "tensorflow",
+#     "torch",
+#     "transformers",
+#     "pillow",
+#     "streamlit",
+#     "gradio",
+# ]
 # 
 # - `numpy`: 数値計算ライブラリ
 # - `nltk`: 自然言語処理ライブラリ
