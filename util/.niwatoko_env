@@ -1,0 +1,4 @@
+ARGUMENT=C:\Users\ms-ef\venv\tableau\query_prep_flow\README.md
+PARAM_M_MODEL=openai-gpt4o
+PARAM_MII_MODEL_INPUT_IMG=chatgpt-4o
+PARAM_O_OUTPUT=./output.md
