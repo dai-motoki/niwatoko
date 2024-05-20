@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='niwatoko',
-    version='1.2.0',
+    version='1.2.2',
     description='自然言語でプログラミングを行うことができる新しいプログラミング言語',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
@@ -21,7 +21,7 @@ setup(
         'anthropic',
         'opencv-python',
         'moviepy',
-        'decorator>=4.0.2,<5.0',
+        'google-cloud-aiplatform'
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
