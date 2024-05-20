@@ -1,0 +1,4 @@
+ARGUMENT=./input.md
+PARAM_M_MODEL=openai-gpt4o
+PARAM_MII_MODEL_INPUT_IMG=openai-gpt4o
+PARAM_O_OUTPUT=./output.md
