@@ -22,6 +22,7 @@ setup(
         'opencv-python',
         'moviepy',
         'decorator>=4.0.2,<5.0',
+        'litellm',
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
