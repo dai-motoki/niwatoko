@@ -11,14 +11,20 @@ import itertools
 import threading
 import sys
 import time
+import base64
+import vertexai
+from vertexai.generative_models import GenerativeModel, Part, FinishReason
+import vertexai.preview.generative_models as generative_models
 
 @click.command()
 @click.argument('file_path', type=click.Path(exists=True), required=False)
-@click.option('-m', '--model', type=click.Choice(['openai', 'openai-gpt4o', 'claude', 'claude-sonnet', 'claude-opus', 'claude-haiku']), default='claude-haiku', help='使用するモデルを選択します。')
+@click.option('-m', '--model', type=click.Choice(['openai', 'openai-gpt4o', 'claude', 'claude-sonnet', 'claude-opus', 'claude-haiku', 'gemini-1.5-pro', 'gemini-1.5-flash']), default='claude-haiku', help='使用するモデルを選択します。')
+@click.option('-mii', '--model-input-image', type=click.Choice(['openai-gpt4o', 'gemini-1.5-pro', 'gemini-1.5-flash']), default='openai-gpt4o', help='使用する画像入力モデルを選択します。')
+# @click.option('-miv', '--model-input-video', type=click.Path(exists=True), help='動画ファイルのパスを指定します。')
 @click.option('-o', '--output', type=click.Path(), help='生成されたコードの出力先ファイルを指定します。')
 @click.option('-v', '--version',  is_flag=True, help='バージョン情報を表示します。')
 
-def main(file_path, model, output, version):
+def main(file_path, model, model_input_image, output, version):
     # print("file_path:", file_path)
     """
     自然言語のソースコードを読み込んで実行するコマンドラインインターフェース。
@@ -26,6 +32,7 @@ def main(file_path, model, output, version):
     Args:
         file_path (str): 自然言語のソースコードが書かれたファイルのパス。
         model (str): 使用するモデル（OpenAIまたはClaude）。
+        model_input_image (str): 使用する画像入力モデル。
         output (str): 生成されたコードの出力先ファイルのパス。
         version (bool): バージョン情報を表示するかどうか。
     """
@@ -39,7 +46,7 @@ def main(file_path, model, output, version):
         print("ファイルパスが指定されていません。")
         return
 
-    processed_content = process_imports(file_path)
+    processed_content = process_imports(file_path, model_input_image)
 
     print("実行中... (Processing...)")
 
@@ -61,6 +68,11 @@ def main(file_path, model, output, version):
             max_tokens=2048,
             temperature=0.5,
         )
+    elif model in ['gemini-1.5-pro', 'gemini-1.5-flash']:
+        generated_code = generate_gemini_response(
+            model=model,
+            prompt=processed_content,
+        )
     else:
         if model == 'claude-sonnet':
             claude_model = 'claude-3-sonnet-20240229'
@@ -76,6 +88,8 @@ def main(file_path, model, output, version):
             max_tokens=4000,
             temperature=0.2,
         )
+    
+
     # ぐるぐるアニメーションを停止
     done = True
     spinner.join()
@@ -101,7 +115,7 @@ def spin(done):
     sys.stdout.write('\rDone!     \n')
 
 import os
-def process_imports(file_path):
+def process_imports(file_path, model_input_image):
     with open(file_path, 'r', encoding='utf-8') as file:
         lines = file.readlines()
     
@@ -143,11 +157,11 @@ def process_imports(file_path):
                     extension = path_within_brackets.split('.')[-1]
                     # print("拡張子:", extension)  # デバッグ用print
                     if extension in ['png', 'jpg', 'jpeg', 'gif']:
-                        print("画像ファイルとして処理")  # デバッグ用print
-                        output.extend(process_image_import(import_path, line))
+                        output.extend(process_image_import(import_path, model_input_image, line))
+
                     elif extension in ['mp4', 'mov', 'avi']:
                         print("動画ファイルとして処理")  # デバッグ用print
-                        output.extend(process_video_import(import_path, line))
+                        output.extend(process_video_import(import_path, model_input_image, line))
                     # 拡張子が指定されていない場合、新しい関数を使用して処理
                     else:
                         # print("拡張子が指定されていないため、process_no_extension_importを使用")  # デバッグ用print
@@ -258,7 +272,7 @@ def process_other_import(import_path, line):
     import_content = get_file_content(import_path)
     return [line, f'```{extension}\n', import_content, '```\n']
 
-def process_image_import(import_path, line):
+def process_image_import(import_path, model_input_image, line):
     """
     画像ファイルのインポートを処理する関数
 
@@ -270,10 +284,15 @@ def process_image_import(import_path, line):
         list: 処理後の出力行のリスト
     """
     import_path = import_path[1:-1]
-    recognized_text = recognize_image_text(import_path)
+    if model_input_image == 'openai-gpt4o':
+        recognized_text = recognize_image_text_gpt4o(import_path)
+    elif model_input_image in ['gemini-1.5-pro', 'gemini-1.5-flash']:
+        recognized_text = recognize_image_text_gemini(model_input_image, import_path)
+    else:
+        recognized_text = "指定された画像入力モデルがサポートされていません。"
     return [line, '```\n', recognized_text, '```\n']
 
-def process_video_import(import_path, line):
+def process_video_import(import_path, model_input_image, line):
     """
     動画ファイルのインポートを処理する関数
 
@@ -284,8 +303,14 @@ def process_video_import(import_path, line):
     Returns:
         list: 処理後の出力行のリスト
     """
+
     import_path = import_path[1:-1]
-    recognized_text = recognize_video_text(import_path)
+    if model_input_image == 'openai-gpt4o':
+        recognized_text = recognize_video_text_gpt4o(import_path)
+    elif model_input_image in ['gemini-1.5-pro', 'gemini-1.5-flash']:
+        recognized_text = recognize_video_text_gemini(model_input_image, import_path)
+    else:
+        recognized_text = "指定された動画入力モデルがサポートされていません。"
     return [line, '```\n', recognized_text, '```\n']
 
 def get_file_content(file_path):
@@ -302,7 +327,15 @@ import base64
 import requests
 
 # OpenAI API Key
-api_key = os.getenv("OPENAI_API_KEY", "YOUR_OPENAI_API_KEY")
+from dotenv import load_dotenv
+
+# .envファイルから環境変数を読み込む
+load_dotenv()
+
+# OpenAI APIキーを環境変数から取得
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise ValueError("OpenAI APIキーが設定されていません。")
 def encode_image(image_path):
     """
     画像ファイルをBase64エンコードする関数
@@ -316,7 +349,7 @@ def encode_image(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
 
-def recognize_image_text(image_path):
+def recognize_image_text_gpt4o(image_path):
     """
     画像ファイルからテキストを認識する関数
 
@@ -341,7 +374,7 @@ def recognize_image_text(image_path):
                 "content": [
                     {
                         "type": "text",
-                        "text": "この画像には何が写っていますか？"
+                        "text": "この画像について限界まで詳細に説明してください lang ja"
                     },
                     {
                         "type": "image_url",
@@ -352,7 +385,7 @@ def recognize_image_text(image_path):
                 ]
             }
         ],
-        "max_tokens": 300
+        "max_tokens": 4095
     }
 
     response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
@@ -362,14 +395,12 @@ def recognize_image_text(image_path):
 
     return content
 
-
-
 import cv2
 from moviepy.editor import VideoFileClip
 import time
 import base64
 
-def recognize_video_text(video_path, seconds_per_frame=1):
+def recognize_video_text_gpt4o(video_path, seconds_per_frame=1):
     """
     動画ファイルからフレームを抽出し、テキストのサマリーを生成する関数
 
@@ -430,7 +461,8 @@ def recognize_video_text(video_path, seconds_per_frame=1):
             "messages": [
                 {
                     "role": "system",
-                    "content": "You are generating a video summary. Please provide a summary of the video. Respond in Markdown."
+                    # "content": "You are generating a video summary. Please provide a summary of the video. Respond in Markdown."
+                    "content": "この動画について限界まで詳細に説明してください lang ja"
                 },
                 {
                     "role": "user",
@@ -441,7 +473,7 @@ def recognize_video_text(video_path, seconds_per_frame=1):
                     ]
                 }
             ],
-            "max_tokens": 300
+            "max_tokens": 4095
         }
         pbar.update(1)
     response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
@@ -450,3 +482,143 @@ def recognize_video_text(video_path, seconds_per_frame=1):
     print('')
 
     return summary
+
+
+
+
+
+def initialize_gemini_model(model):
+    """
+    Geminiモデルを初期化する共通関数
+
+    Args:
+        model (str): 使用するGeminiモデルの名前
+
+    Returns:
+        GenerativeModel: 初期化されたGeminiモデル
+    """
+    # model名に -review-0514 を追加
+    model = f"{model}-preview-0514"
+    
+    # 環境変数からプロジェクトとロケーションを取得
+    from dotenv import load_dotenv
+    load_dotenv()
+
+    project = os.getenv("GEMINI_PROJECT")
+    location = os.getenv("GEMINI_LOCATION")
+    
+    # Vertex AIの初期化
+    vertexai.init(project=project, location=location)
+    return GenerativeModel(model)
+
+def recognize_image_text_gemini(model, image_path):
+    """
+    Geminiモデルを使用して画像認識を行う関数
+
+    Args:
+        model (str): 使用するGeminiモデルの名前
+        image_path (str): 画像ファイルのパス
+
+    Returns:
+        str: 生成されたテキスト
+    """
+    model = initialize_gemini_model(model)
+
+    # 画像ファイルをBase64エンコード
+    with open(image_path, "rb") as image_file:
+        base64_image = base64.b64encode(image_file.read()).decode('utf-8')
+
+    # 画像データをPartオブジェクトとして作成
+    image1 = Part.from_data(
+        mime_type="image/jpeg",
+        data=base64.b64decode(base64_image)
+    )
+
+    # コンテンツ生成リクエストを送信
+    responses = model.generate_content(
+        [image1, """この画像について限界まで詳細に説明してください lang ja"""],
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        stream=True,
+    )
+
+    # 生成されたテキストを結合
+    generated_text = ""
+    for response in responses:
+        generated_text += response.text
+
+    return generated_text
+
+def recognize_video_text_gemini(model, video_path):
+    """
+    Geminiモデルを使用して動画認識を行う関数
+
+    Args:
+        model (str): 使用するGeminiモデルの名前
+        video_path (str): 動画ファイルのパス
+
+    Returns:
+        str: 生成されたテキスト
+    """
+    model = initialize_gemini_model(model)
+
+    # 動画ファイルをBase64エンコード
+    with open(video_path, "rb") as video_file:
+        base64_video = base64.b64encode(video_file.read()).decode('utf-8')
+
+    # 動画データをPartオブジェクトとして作成
+    video1 = Part.from_data(
+        mime_type="video/mp4",
+        data=base64.b64decode(base64_video)
+    )
+
+    # コンテンツ生成リクエストを送信
+    responses = model.generate_content(
+        [video1, """この動画について限界まで詳細に説明してください lang ja"""],
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        stream=True,
+    )
+
+    # 生成されたテキストを結合
+    generated_text = ""
+    for response in responses:
+        generated_text += response.text
+
+    return generated_text
+
+def generate_gemini_response(model, prompt):
+    """
+    Geminiモデルを使用してテキストを生成する関数
+
+    Returns:
+        str: 生成されたテキスト
+    """
+    model = initialize_gemini_model(model)
+
+    responses = model.generate_content(
+        [prompt],
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        stream=True,
+    )
+
+    generated_text = ""
+    for response in responses:
+        generated_text += response.text
+
+    return generated_text
+
+# 共通設定
+generation_config = {
+    "max_output_tokens": 8192,
+    "temperature": 1,
+    "top_p": 0.95,
+}
+
+safety_settings = {
+    generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+}

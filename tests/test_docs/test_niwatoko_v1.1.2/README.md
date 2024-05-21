@@ -22,6 +22,25 @@ Anthropic社のドキュメント変数機能をオープンソースで再現�
    pip install --upgrade niwatoko
    ```
 
+2. APIキーの設定
+- OpenAI APIキーの設定
+export OPENAI_API_KEY=sk-xxxxx
+
+- Anthropic APIキーの設定
+export ANTHROPIC_API_KEY=sk-xxxxx
+
+- GEMINIプロジェクトの設定
+export GEMINI_PROJECT=gemini-xxxxx
+export GEMINI_LOCATION=asia-northeast1
+
+- `gemini-1.5-pro`と`gemini-1.5-flash`モデルを追加しました。
+  - これらのモデルは画像入力に対応しており、高品質な出力が期待できます。
+  - 使用するには、`-m gemini-1.5-pro`または`-m gemini-1.5-flash`オプションを指定します。
+- 画像入力モデルを選択するための`-mii`または`--model-input-image`オプションを追加しました。
+  - 画像入力に対応したモデル（`openai-gpt4o`、`gemini-1.5-pro`、`gemini-1.5-flash`）から選択できます。
+  - デフォルトは`openai-gpt4o`です。
+
+
 
 ## 練習問題
 
