@@ -159,3 +159,4 @@ cython_debug/
 #.idea/
 dev_niwatoko/
 .DS_Store
+.SourceSageAssets/
