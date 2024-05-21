@@ -4,6 +4,7 @@ import os
 from niwatoko.foundation_model.interpretation.llm.claude import generate_response
 from niwatoko.foundation_model.interpretation.llm.gpt import generate_response as gpt_generate_response
 from niwatoko.foundation_model.interpretation.llm.gpt import generate_response_gpt4o as gpt_generate_response_gpt4o
+from niwatoko.foundation_model.interpretation.llm.litellm_tool import generate_response as litellm_enerate_response
 import niwatoko
 import re
 from tqdm import tqdm
@@ -14,7 +15,7 @@ import time
 
 @click.command()
 @click.argument('file_path', type=click.Path(exists=True), required=False)
-@click.option('-m', '--model', type=click.Choice(['openai', 'openai-gpt4o', 'claude', 'claude-sonnet', 'claude-opus', 'claude-haiku']), default='claude-haiku', help='使用するモデルを選択します。')
+@click.option('-m', '--model', type=click.STRING, default='claude-haiku', help='使用するモデルを選択します。例: openai, openai-gpt4o, claude, claude-sonnet, claude-opus, claude-haiku, litellm/modelname')
 @click.option('-o', '--output', type=click.Path(), help='生成されたコードの出力先ファイルを指定します。')
 @click.option('-v', '--version',  is_flag=True, help='バージョン情報を表示します。')
 
@@ -29,6 +30,14 @@ def main(file_path, model, output, version):
         output (str): 生成されたコードの出力先ファイルのパス。
         version (bool): バージョン情報を表示するかどうか。
     """
+    
+    if not is_valid_model_name(model):
+        valid_models = ['openai', 'openai-gpt4o', 'claude', 'claude-sonnet', 'claude-opus', 'claude-haiku']
+        valid_models_str = ", ".join(valid_models)
+        click.echo(f"無効なモデル名です: {model}")
+        click.echo(f"使用可能なモデル: {valid_models_str}, または litellm/modelname の形式のモデル名")
+        return
+    
     if version:
         try:
             print(f"niwatoko version: {niwatoko.__version__}")
@@ -61,6 +70,16 @@ def main(file_path, model, output, version):
             max_tokens=2048,
             temperature=0.5,
         )
+    elif 'litellm/' in model:
+        model = model.replace("litellm/", "")
+        print("litellm model:", model)
+        generated_code = litellm_enerate_response(
+            model=model,
+            prompt=processed_content,
+            max_tokens=2048,
+            temperature=0.5,
+        )
+        
     else:
         if model == 'claude-sonnet':
             claude_model = 'claude-3-sonnet-20240229'
@@ -85,6 +104,15 @@ def main(file_path, model, output, version):
             file.write(generated_code)
             print(f"生成されたコードを {output} に書き出しました。")
             print(f"Generated code has been written to {output}.")
+
+def is_valid_model_name(model_name):
+    valid_models = ['openai', 'openai-gpt4o', 'claude', 'claude-sonnet', 'claude-opus', 'claude-haiku']
+    if model_name in valid_models:
+        return True
+    elif re.match(r'^litellm/\S+$', model_name):
+        return True
+    else:
+        return False
 
 def spin(done):
     """
