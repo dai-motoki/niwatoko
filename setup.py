@@ -21,7 +21,8 @@ setup(
         'anthropic',
         'opencv-python',
         'moviepy',
-        'google-cloud-aiplatform'
+        'decorator>=4.0.2,<5.0',
+        'litellm',
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',

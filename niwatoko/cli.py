@@ -4,8 +4,10 @@ import os
 from niwatoko.foundation_model.interpretation.llm.claude import generate_response
 from niwatoko.foundation_model.interpretation.llm.gpt import generate_response as gpt_generate_response
 from niwatoko.foundation_model.interpretation.llm.gpt import generate_response_gpt4o as gpt_generate_response_gpt4o
+from niwatoko.foundation_model.interpretation.llm.litellm_tool import generate_response as litellm_enerate_response
 import niwatoko
 import re
+from urllib.parse import urlparse
 from tqdm import tqdm
 import itertools
 import threading
@@ -17,8 +19,8 @@ from vertexai.generative_models import GenerativeModel, Part, FinishReason
 import vertexai.preview.generative_models as generative_models
 
 @click.command()
-@click.argument('file_path', type=click.Path(exists=True), required=False)
-@click.option('-m', '--model', type=click.Choice(['openai', 'openai-gpt4o', 'claude', 'claude-sonnet', 'claude-opus', 'claude-haiku', 'gemini-1.5-pro', 'gemini-1.5-flash']), default='claude-haiku', help='使用するモデルを選択します。')
+@click.argument('file_path', type=click.Path(), required=False)
+@click.option('-m', '--model', type=click.STRING, default='claude-haiku', help='使用するモデルを選択します。例: openai, openai-gpt4o, claude, claude-sonnet, claude-opus, claude-haiku, litellm/modelname')
 @click.option('-mii', '--model-input-image', type=click.Choice(['openai-gpt4o', 'gemini-1.5-pro', 'gemini-1.5-flash']), default='openai-gpt4o', help='使用する画像入力モデルを選択します。')
 # @click.option('-miv', '--model-input-video', type=click.Path(exists=True), help='動画ファイルのパスを指定します。')
 @click.option('-o', '--output', type=click.Path(), help='生成されたコードの出力先ファイルを指定します。')
@@ -36,6 +38,14 @@ def main(file_path, model, model_input_image, output, version):
         output (str): 生成されたコードの出力先ファイルのパス。
         version (bool): バージョン情報を表示するかどうか。
     """
+    
+    if not is_valid_model_name(model):
+        valid_models = ['openai', 'openai-gpt4o', 'claude', 'claude-sonnet', 'claude-opus', 'claude-haiku']
+        valid_models_str = ", ".join(valid_models)
+        click.echo(f"無効なモデル名です: {model}")
+        click.echo(f"使用可能なモデル: {valid_models_str}, または litellm/modelname の形式のモデル名")
+        return
+    
     if version:
         try:
             print(f"niwatoko version: {niwatoko.__version__}")
@@ -68,11 +78,16 @@ def main(file_path, model, model_input_image, output, version):
             max_tokens=2048,
             temperature=0.5,
         )
-    elif model in ['gemini-1.5-pro', 'gemini-1.5-flash']:
-        generated_code = generate_gemini_response(
+    elif 'litellm/' in model:
+        model = model.replace("litellm/", "")
+        print("litellm model:", model)
+        generated_code = litellm_enerate_response(
             model=model,
             prompt=processed_content,
+            max_tokens=2048,
+            temperature=0.5,
         )
+        
     else:
         if model == 'claude-sonnet':
             claude_model = 'claude-3-sonnet-20240229'
@@ -100,6 +115,15 @@ def main(file_path, model, model_input_image, output, version):
             print(f"生成されたコードを {output} に書き出しました。")
             print(f"Generated code has been written to {output}.")
 
+def is_valid_model_name(model_name):
+    valid_models = ['openai', 'openai-gpt4o', 'claude', 'claude-sonnet', 'claude-opus', 'claude-haiku']
+    if model_name in valid_models:
+        return True
+    elif re.match(r'^litellm/\S+$', model_name):
+        return True
+    else:
+        return False
+
 def spin(done):
     """
     ぐるぐるアニメーションを表示する関数
@@ -114,10 +138,26 @@ def spin(done):
         time.sleep(0.1)
     sys.stdout.write('\rDone!     \n')
 
-import os
-def process_imports(file_path, model_input_image):
-    with open(file_path, 'r', encoding='utf-8') as file:
-        lines = file.readlines()
+def process_imports(file_path_or_url, model_input_image):
+    if file_path_or_url.startswith('http://') or file_path_or_url.startswith('https://'):
+        # URLからマークダウンファイルを取得する
+        response = requests.get(file_path_or_url)
+        if response.status_code == 200:
+            content = response.text
+        else:
+            click.echo(f"URLからのファイル取得に失敗しました: {file_path_or_url}")
+            return None
+    else:
+        # ローカルのファイルパスからマークダウンファイルを読み込む
+        if os.path.exists(file_path_or_url):
+            with open(file_path_or_url, 'r', encoding='utf-8') as file:
+                content = file.read()
+        else:
+            click.echo(f"指定されたファイルが見つかりません: {file_path_or_url}")
+            return None
+    
+    # マークダウンファイルの内容を行ごとに分割
+    lines = content.split('\n')
     
     output = []
     for line in lines:
@@ -127,7 +167,9 @@ def process_imports(file_path, model_input_image):
             if len(parts) == 2:
                 import_path = parts[1].strip()
                 print('import_path:', import_path)
+                
                 if '[' in import_path and not import_path.startswith('['):
+                    print("aaaaaaaa")
                     # ブラケットで囲まれたパスを抽出
                     path_within_brackets = import_path[1:-1]
                     # print("ブラケット内のパス:", path_within_brackets)  # デバッグ用print
@@ -152,6 +194,24 @@ def process_imports(file_path, model_input_image):
                 elif import_path.startswith('[') and import_path.endswith(']'):
                     # ブラケットで囲まれたパスを抽出
                     path_within_brackets = import_path[1:-1]
+                    if path_within_brackets.startswith('http://') or path_within_brackets.startswith('https://'):
+                        # URLの場合、ファイルをダウンロードして.cacheフォルダに保存
+                        parsed_url = urlparse(path_within_brackets)
+                        file_name = os.path.basename(parsed_url.path)
+                        cache_dir = '.cache'
+                        os.makedirs(cache_dir, exist_ok=True)
+                        cached_file_path = os.path.join(cache_dir, file_name)
+                        response = requests.get(path_within_brackets)
+                        if response.status_code == 200:
+                            print(cached_file_path)
+                            with open(cached_file_path, 'wb') as file:
+                                file.write(response.content)
+                            path_within_brackets = cached_file_path
+                            import_path = f"[{cached_file_path}]"
+                        else:
+                            click.echo(f"URLからのファイル取得に失敗しました: {path_within_brackets}")
+                            continue
+                        
                     # print("ブラケット内のパス:", path_within_brackets)  # デバッグ用print
                     # 拡張子を取得
                     extension = path_within_brackets.split('.')[-1]
