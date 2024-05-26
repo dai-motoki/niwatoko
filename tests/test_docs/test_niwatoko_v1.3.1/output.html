@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>創造魔法 ゾルトラーク</title>
+    <link rel="stylesheet" href="consultant-styles.css">
+    <script>
+        // スライドを次に進める関数
+        let currentSlide = 0;
+        function nextSlide() {
+            const slides = document.querySelectorAll('.slide');
+            slides[currentSlide].style.display = 'none';
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].style.display = 'block';
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach((slide, index) => {
+                if (index !== 0) slide.style.display = 'none';
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="slide-container">
+
+        <!-- 表紙 -->
+        <div class="slide" style="background-image: url('https://source.unsplash.com/random/1920x1080/?magic'); background-size: cover; background-position: center; opacity: 0.3;">
+            <h1 class="slide-title">創造魔法 ゾルトラーク</h1>
+        </div>
+
+        <!-- 概要 -->
+        <div class="slide" style="background-color: #1f2833;">
+            <h2 class="slide-title" style="color: #66fcf1;">創造魔法 ゾルトラーク</h2>
+            <p class="slide-text" style="color: #c5c6c7;">魔法の力を再定義する、革新的な魔法システム</p>
+        </div>
+
+        <!-- ゾルトラークとは -->
+        <div class="slide" style="background-color: #45a29e;">
+            <h2 class="slide-title" style="color: #0b0c10;">ゾルトラークとは</h2>
+            <ul class="slide-text" style="color: #c5c6c7;">
+                <li>本格的な魔法時代の始まりを象徴する強大な創造魔法</li>
+                <li>未体系であった呪文からの術の発動を、魔法の文法体系に昇華</li>
+                <li>高速かつ広範囲な術式展開と強大な魔法の発動を可能とするシステム</li>
+            </ul>
+        </div>
+
+        <!-- モデルの能力1 -->
+        <div class="slide" style="background-image: url('https://source.unsplash.com/random/1920x1080/?fire,magic'); background-size: cover; background-position: center; opacity: 0.3;">
+            <h2 class="slide-title">圧倒的な破壊力</h2>
+            <p class="slide-text">数語の呪文から起動術式を用いて、複雑な術式を一瞬で展開し、敵を焼き尽くす炎や轟音の魔法攻撃を繰り出します。</p>
+        </div>
+
+        <!-- モデルの能力2 -->
+        <div class="slide" style="background-color: #1f2833;">
+            <h2 class="slide-title" style="color: #66fcf1;">高速詠唱</h2>
+            <p class="slide-text" style="color: #c5c6c7;">詠唱や無詠唱に関わらず、一瞬で強力な魔法を発動し、圧倒的な破壊力で敵を蹴散らすことが可能です。</p>
+        </div>
+
+        <!-- モデルの能力3 -->
+        <div class="slide" style="background-color: #45a29e;">
+            <h2 class="slide-title" style="color: #0b0c10;">秘匿性</h3>
+            <p class="slide-text" style="color: #c5c6c7;">独自の呪文言語や暗号化された呪文を使うことで、敵に魔法の内容を悟られることなく奇襲攻撃を仕掛けられます。</p>
+        </div>
+
+        <!-- モデルの評価 -->
+        <div class="slide" style="background-image: url('https://source.unsplash.com/random/1920x1080/?magic-circle'); background-size: cover; background-position: center; opacity: 0.3;">
+            <h2 class="slide-title">魔法の増幅</h2>
+            <p class="slide-text">術師の数語の呪文を強力な言霊の数々を織り込んだ魔法陣を通じて、魔法の範囲と威力を大幅に向上させることが可能です。</p>
+        </div>
+
+        <!-- 言語トークン化 -->
+        <div class="slide" style="background-color: #1f2833;">
+            <h2 class="slide-title" style="color: #66fcf1;">革新的な言語トークン化</h2>
+            <p class="slide-text" style="color: #c5c6c7;">ゾルトラークの新しい言語トークン化技術により、異なる言語ファミリーにわたる呪文の圧縮率が大幅に向上しました。例えば、エルフ語では2.9倍、ドワーフ語では1.7倍の呪文の短縮が実現されています。</p>
+        </div>
+
+        <!-- 魔法の安全性と制限 -->
+        <div class="slide" style="background-color: #45a29e;">
+            <h2 class="slide-title" style="color: #0b0c10;">安全性</h2>
+            <ul class="slide-text" style="color: #c5c6c7;">
+                <li>ゾルトラークは、禁忌の魔法の排除や術式の洗練など、あらゆる魔法体系において安全性を追求しています。</li>
+                <li>新しい安全術式を構築し、危険な魔法の発動に対する防御術を提供しています。</li>
+            </ul>
+        </div>
+
+        <!-- 魔法の利用可能性 -->
+        <div class="slide" style="background-image: url('https://source.unsplash.com/random/1920x1080/?magic-book'); background-size: cover; background-position: center; opacity: 0.3;">
+            <h2 class="slide-title">利用可能性</h2>
+            <ul class="slide-text">
+                <li>ゾルトラークは、テキストと画像の魔法を操るシステムとして、一般魔法使いおよび上級魔法使いに提供されます。</li>
+                <li>魔法書では、ゾルトラークは2倍の速度、半分のマナ消費、5倍の魔法詠唱速度で利用可能です。</li>
+            </ul>
+        </div>
+    </div>
+    <button onclick="nextSlide()" style="position: absolute; bottom: 20px; right: 20px; padding: 10px 20px; background-color: #45a29e; color: #0b0c10; border: none; border-radius: 5px;">次へ</button>
+</body>
+</html>

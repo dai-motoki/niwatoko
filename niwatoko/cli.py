@@ -47,7 +47,7 @@ def main(file_path, model, model_input_image, output, version):
         return
 
     processed_content = process_imports(file_path, model_input_image)
-
+    print("processed_content:", processed_content)
     print("実行中... (Processing...)")
 
     # ぐるぐるアニメーションを表示するスレッドを開始
@@ -55,23 +55,64 @@ def main(file_path, model, model_input_image, output, version):
     spinner = threading.Thread(target=spin, args=(lambda: done,))
     spinner.start()
 
+    while True:
+        generated_code = generate_code(model, processed_content)
+        
+        # ぐるぐるアニメーションを停止
+        done = True
+        spinner.join()
+
+        if output:
+            with open(output, 'w', encoding = "utf-8") as file:
+                code_block_start = generated_code.find("```") + 10           # コードブロックの開始位置を見つける
+                code_block_end = generated_code.find("```", code_block_start)     # コードブロックの終了位置を見つける
+                code_content = generated_code[code_block_start:code_block_end]    # コードブロックの内容を抽出する
+                file.write(code_content)                                          # 抽出したコードをファイルに書き込む
+                print(f"生成されたコードを {output} に書き出しました。")
+                print(f"Generated code has been written to {output}.")
+                print("生成されたコードを実行します。")                             # 生成されたコードを実行する旨を表示
+                exec_globals = {}                                                 # 実行環境のグローバル変数を初期化
+                exec_locals = {}                                                  # 実行環境のローカル変数を初期化
+            try:
+                exec(code_content, exec_globals, exec_locals)                 # execを使用して生成されたコードを実行
+                print("生成されたコードの実行が成功しました。")                 # 実行成功のメッセージを表示
+                break  # 成功した場合、ループを抜ける
+            except Exception as e:
+                print("生成されたコードの実行に失敗しました。")                 # 実行失敗のメッセージを表示
+                print("エラー:", str(e))                                      # エラーメッセージを表示
+                # エラー要因を想定してテキストで出力
+                error_analysis = generate_code(
+                    model=model,
+                    content=f"以下のエラーが発生しました。考えられる要因を分析してください。\n\nエラー: {str(e)}"
+                )
+                print("エラー要因の分析結果:", error_analysis)
+                user_input = input("エラーが発生しました。自動修正を試みますか？ (y/n): ")  # 自動修正を試みるかユーザーに確認
+                if user_input.lower() == 'y':
+                    # エラー要因の分析結果をプロンプトに追加
+                    processed_content += f"\n# エラーが出ました。修正してください: {str(e)}\n# エラー要因の分析:\n{error_analysis}"
+                else:
+                    print("自動修正をスキップします。")                         # 自動修正をスキップする旨を表示
+
+
+
+def generate_code(model, content):
     if model == 'openai' or model == 'openai-gpt-turbo':
-        generated_code = gpt_generate_response(
+        return gpt_generate_response(
             model="gpt-4-turbo-2024-04-09",
-            prompt=processed_content,
+            prompt=content,
             max_tokens=1000,
             temperature=0.5,
         )
     elif model == 'openai-gpt4o':
-        generated_code = gpt_generate_response_gpt4o(
-            prompt=processed_content,
+        return gpt_generate_response_gpt4o(
+            prompt=content,
             max_tokens=2048,
             temperature=0.5,
         )
     elif model in ['gemini-1.5-pro', 'gemini-1.5-flash']:
-        generated_code = generate_gemini_response(
+        return generate_gemini_response(
             model=model,
-            prompt=processed_content,
+            prompt=content,
         )
     else:
         if model == 'claude-sonnet':
@@ -82,23 +123,12 @@ def main(file_path, model, model_input_image, output, version):
             claude_model = 'claude-3-haiku-20240307'  # デフォルトはhaiku
         
         print("model:", claude_model)
-        generated_code = generate_response(
+        return generate_response(
             model=claude_model,
-            prompt=processed_content,
+            prompt=content,
             max_tokens=4000,
             temperature=0.2,
         )
-    
-
-    # ぐるぐるアニメーションを停止
-    done = True
-    spinner.join()
-
-    if output:
-        with open(output, 'w', encoding = "utf-8") as file:
-            file.write(generated_code)
-            print(f"生成されたコードを {output} に書き出しました。")
-            print(f"Generated code has been written to {output}.")
 
 def spin(done):
     """
@@ -191,8 +221,6 @@ def process_variable_imports(line):
         # 同一階層内のファイルの内容を取得
         import_content = get_file_content(import_path)
         output.extend([line, '```\n', import_content, '```\n'])
-    else:
-        output.append(line)
     return output
 
 def process_no_extension_import(import_path, line):
@@ -374,7 +402,8 @@ def recognize_image_text_gpt4o(image_path):
                 "content": [
                     {
                         "type": "text",
-                        "text": "この画像について限界まで詳細に説明してください lang ja"
+                        # "text": "この画像について限界まで詳細に説明してください lang ja"
+                        "text": "この画像をOCRしてください文字のみ lang ja"
                     },
                     {
                         "type": "image_url",
@@ -385,7 +414,7 @@ def recognize_image_text_gpt4o(image_path):
                 ]
             }
         ],
-        "max_tokens": 4095
+        "max_tokens": 100
     }
 
     response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)

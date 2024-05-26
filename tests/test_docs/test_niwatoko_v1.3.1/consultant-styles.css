@@ -1,0 +1,91 @@
+/* bodyのスタイルを設定 */
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #e0e0e0; /* 柔らかいグレーの背景色 */
+    font-family: 'Helvetica Neue', sans-serif; /* モダンなフォント */
+    color: #333; /* ダークグレーのテキストカラー */
+}
+
+/* スライドコンテナのスタイルを設定 */
+.slide-container {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #f5f7fa, #c3cfe2); /* グラデーション背景 */
+}
+
+/* スライドのスタイルを設定 */
+.slide {
+    position: relative;
+    opacity: 0;
+    width: 70%; /* 画面の70%の幅 */
+    height: calc(70% *3 / 3.5); /* 3:4の縦横比を維持 */
+    max-width: 900px;
+    background: rgba(255, 255, 255, 0.9); /* 半透明の白背景 */
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* より強いシャドウ */
+    /* animation: fadeInScale 1s ease-out forwards; */
+    animation: slideIn 1s ease-out forwards;
+    backdrop-filter: blur(10px); /* 背景をぼかす */
+}
+
+/* スライドタイトルのスタイルを設定 */
+.slide-title {
+    font-size: 2.5em;
+    margin-bottom: 25px;
+    color: #222; /* より濃いグレー */
+    text-align: center; /* 中央揃え */
+    font-weight: bold; /* 太字 */
+}
+
+/* スライドコンテンツのスタイルを設定 */
+.slide-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* コンテンツを左右に配置 */
+}
+
+/* スライド画像のスタイルを設定 */
+.slide-image {
+    width: 320px;
+    height: 320px;
+    margin-right: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 画像にもシャドウを追加 */
+}
+
+/* スライドテキストのスタイルを設定 */
+.slide-text {
+    font-size: 1.3em;
+    color: #444; /* 中間のグレー */
+    line-height: 1.6;
+    max-width: 60%; /* テキストの最大幅を設定 */
+}
+
+/* スライドインのアニメーションを設定 */
+@keyframes slideIn {
+    to {
+        left: 0;
+        opacity: 1;
+    }
+}
+/* フェードインとスケールアップのアニメーションを設定 */
+@keyframes fadeInScale {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

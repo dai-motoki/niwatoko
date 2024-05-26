@@ -8,6 +8,10 @@ niwatoko_dir = os.path.dirname(niwatoko.__file__)                        # zoltr
 with open(f"{niwatoko_dir}/grammar/system.md", "r", encoding = "utf-8") as f:
     system_prompt = f.read()
 
+
+client = OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY")
+)
 def generate_response(model, prompt, max_tokens, temperature):
     """
     OpenAI APIを使用してプロンプトに対する応答を生成する関数。
@@ -22,9 +26,6 @@ def generate_response(model, prompt, max_tokens, temperature):
         str: 生成された応答テキスト。
     """
     
-    client = OpenAI(
-        api_key=os.environ.get("OPENAI_API_KEY")
-    )
 
     model = "gpt-4-turbo-2024-04-09"
 
@@ -53,6 +54,7 @@ def generate_response_gpt4o(prompt, max_tokens, temperature):
     Returns:
         str: 生成された応答テキスト。
     """
+    print(prompt)
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[{"role": "user", "content": prompt}],

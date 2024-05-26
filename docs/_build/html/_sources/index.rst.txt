@@ -2,12 +2,9 @@
    :maxdepth: 2
    :caption: Contents:
 
-   requirements
    installation
-   installation_en
    usage
-   usage_en
+   history
    modules
    contributing
    authors
-   history
