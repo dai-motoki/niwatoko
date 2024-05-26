@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultant Slides</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="slide-container">
+        <div class="slide" id="slide1">
+            <h1 class="slide-title">Generative AI for Florists</h1>
+        </div>
+        <div class="slide" id="slide2">
+            <h1 class="slide-title">Market Analysis</h1>
+            <div class="slide-content">
+                <img src="https://source.unsplash.com/random/1920x1920/?market" alt="Market Analysis" class="slide-image">
+                <p class="slide-text">The floristry market is seeing significant changes with the introduction of generative AI, enhancing customer personalization and operational efficiency.</p>
+            </div>
+        </div>
+        <div class="slide" id="slide3">
+            <h1 class="slide-title">Strategic Initiatives</h1>
+            <div class="slide-content">
+                <img src="https://source.unsplash.com/random/1920x1920/?strategy" alt="Strategy" class="slide-image">
+                <p class="slide-text">We propose implementing AI-driven tools to automate bouquet designs, optimize supply chains, and enhance customer engagement through predictive analytics.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('contextmenu', function(event) {
+            event.preventDefault();
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach(slide => {
+                slide.style.animation = 'slideIn 1s ease-out forwards';
+            });
+        });
+    </script>
+</body>
+</html>

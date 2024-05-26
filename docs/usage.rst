@@ -1,4 +1,4 @@
-niwatoko 言語の使用方法
+使用方法
 ==============================
 
 niwatoko 言語は、自然言語プログラミングを実現するためのPython言語です。以下の手順で使用できます。
@@ -9,9 +9,58 @@ niwatoko 言語は、自然言語プログラミングを実現するためのPy
 
       pip install niwatoko
 
-2. niwatokoはシェルで使用する自然言語プログラミング言語です。以下の2つの方法で使用できます。
+2. 環境変数を設定します。（必要に応じて設定してください）
 
-   - インタプリタモード: 2つの使い方があります。
+   .. code-block:: shell
+
+      # GCP GEMINI の設定
+      export GEMINI_PROJECT=gemini-xxxxx
+      export GEMINI_LOCATION=asia-northeast1
+
+      # OpenAI APIキーの設定
+      export OPENAI_API_KEY=sk-xxxx
+
+      # Anthropic APIキーの設定  
+      export ANTHROPIC_API_KEY=sk-ant-xxxxx
+
+   これらの環境変数は、niwatoko言語が内部で使用する各種APIやプロジェクトの設定に必要です。適切な値を設定してください。
+
+3. niwatokoはシェルで使用する自然言語プログラミング言語です。以下の方法で使用できます。
+
+   - コンパイラモード: ``niwatoko`` コマンドを使用して、自然言語のソースコードを直接実行することができます。
+
+     .. code-block:: shell
+
+        $ niwatoko example.md -o example.py
+
+     ``example.md`` ファイルに書かれた自然言語のソースコードが、中間生成ファイル ``example.py`` に変換されて実行されます。
+
+     モデルの選択は以下のオプションで行えます:
+
+     - ``-m`` または ``--model``: 使用するモデルを選択します。デフォルトは ``claude-haiku`` です。
+       選択可能なモデル:
+
+       - ``openai-gpt4o`` . 
+       - ``claude-sonnet`` . 
+       - ``claude-opus`` . 
+       - ``claude-haiku`` . 
+       - ``gemini-1.5-pro`` . 
+       - ``gemini-1.5-flash`` . 
+
+     - ``-mii`` または ``--model-input-image``: 使用する画像解釈モデルを選択します。デフォルトは ``openai-gpt4o`` です。  
+       選択可能なモデル: 
+
+       - ``openai-gpt4o`` . 
+       - ``gemini-1.5-pro`` . 
+       - ``gemini-1.5-flash`` . 
+
+     例えば、以下のようにモデルを指定して実行できます:
+
+     .. code-block:: shell
+
+        $ niwatoko example.md -m openai -mii gemini-1.5-pro -o example.py
+
+   <!-- - インタプリタモード: 2つの使い方があります。
      1. ``niwatoko`` コマンドを単独で実行すると、Pythonのようにインタプリタの画面が表示されます。ここで自然言語の命令を入力し、対話的にプログラムを実行できます。
 
         .. code-block:: shell
@@ -28,17 +77,9 @@ niwatoko 言語は、自然言語プログラミングを実現するためのPy
            $ niwatoko ""Hello, World!" を表示してください"
            Hello, World!
 
-        これにより、自然言語の命令がPythonコードに変換され、その場で実行されます。実行結果は標準出力に表示されます。
+        これにより、自然言語の命令がPythonコードに変換され、その場で実行されます。実行結果は標準出力に表示されます。 -->
 
-   - コンパイラモード: ``niwatoko`` コマンドを使用して、自然言語のソースコードを直接実行することができます。
-
-     .. code-block:: shell
-
-        $ niwatoko example.md
-
-     ``example.md`` ファイルに書かれた自然言語のソースコードが、そのまま実行されます。コンパイル済みのPythonコードを生成せずに、直接niwatokoで実行できるので便利です。
-
-3. niwatokoは、Pythonの代替品として使用できる自然言語プログラミング言語です。Pythonと同等の機能を提供しつつ、より直感的で読みやすいコードを書くことができます。以下に、簡単なものから少し複雑なものまで、niwatokoの完全自然言語プログラムの例を示します。
+4. niwatokoは、Pythonの代替品として使用できる自然言語プログラミング言語です。Pythonと同等の機能を提供しつつ、より直感的で読みやすいコードを書くことができます。以下に、簡単なものから少し複雑なものまで、niwatokoの完全自然言語プログラムの例を示します。
 
    .. code-block:: md
 
@@ -91,14 +132,14 @@ niwatoko 言語は、自然言語プログラミングを実現するためのPy
 
    .. code-block:: shell
 
-      $ niwatoko hello_world.md
+      $ niwatoko hello_world.md -o hello_world.py
       Hello, World!
 
-      $ niwatoko greeting.md
+      $ niwatoko greeting.md -o greeting.py
       名前を入力してください: 山田
       こんにちは、山田さん！
 
-      $ niwatoko fibonacci.md
+      $ niwatoko fibonacci.md -o fibonacci.py
       1 番目のフィボナッチ数は 1
       2 番目のフィボナッチ数は 1
       3 番目のフィボナッチ数は 2
@@ -110,11 +151,11 @@ niwatoko 言語は、自然言語プログラミングを実現するためのPy
       9 番目のフィボナッチ数は 34
       10 番目のフィボナッチ数は 55
 
-      $ niwatoko prime_number.md
+      $ niwatoko prime_number.md -o prime_number.py
       数値を入力してください: 17
       17 は素数です
 
-      $ niwatoko prime_number.md  
+      $ niwatoko prime_number.md -o prime_number.py
       数値を入力してください: 24
       24 は素数ではありません
 

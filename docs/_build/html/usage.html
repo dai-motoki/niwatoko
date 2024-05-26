@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>niwatoko 言語の使用方法 &#8212; niwatoko 0.1.0 documentation</title>
+    <title>使用方法 &#8212; niwatoko 0.1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
     <script src="_static/documentation_options.js?v=01f34227"></script>
@@ -13,8 +13,8 @@
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Modules" href="modules.html" />
-    <link rel="prev" title="niwatoko 言語のインストール方法" href="installation.html" />
+    <link rel="next" title="歴史" href="history.html" />
+    <link rel="prev" title="インストール方法" href="installation.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -32,8 +32,8 @@
 
           <div class="body" role="main">
             
-  <section id="niwatoko">
-<h1>niwatoko 言語の使用方法<a class="headerlink" href="#niwatoko" title="Link to this heading">¶</a></h1>
+  <section id="id1">
+<h1>使用方法<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
 <p>niwatoko 言語は、自然言語プログラミングを実現するためのPython言語です。以下の手順で使用できます。</p>
 <ol class="arabic">
 <li><p>niwatoko 言語をインストールします。</p>
@@ -41,35 +41,75 @@
 </pre></div>
 </div>
 </li>
-<li><p>niwatokoはシェルで使用する自然言語プログラミング言語です。以下の2つの方法で使用できます。</p>
+<li><p>環境変数を設定します。（必要に応じて設定してください）</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># GCP GEMINI の設定</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">GEMINI_PROJECT</span><span class="o">=</span>gemini-xxxxx
+<span class="nb">export</span><span class="w"> </span><span class="nv">GEMINI_LOCATION</span><span class="o">=</span>asia-northeast1
+
+<span class="c1"># OpenAI APIキーの設定</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">OPENAI_API_KEY</span><span class="o">=</span>sk-xxxx
+
+<span class="c1"># Anthropic APIキーの設定</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_API_KEY</span><span class="o">=</span>sk-ant-xxxxx
+</pre></div>
+</div>
+<p>これらの環境変数は、niwatoko言語が内部で使用する各種APIやプロジェクトの設定に必要です。適切な値を設定してください。</p>
+</li>
+<li><p>niwatokoはシェルで使用する自然言語プログラミング言語です。以下の方法で使用できます。</p>
 <ul>
-<li><p>インタプリタモード: 2つの使い方があります。
-1. <code class="docutils literal notranslate"><span class="pre">niwatoko</span></code> コマンドを単独で実行すると、Pythonのようにインタプリタの画面が表示されます。ここで自然言語の命令を入力し、対話的にプログラムを実行できます。</p>
-<blockquote>
-<div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>niwatoko
+<li><p>コンパイラモード: <code class="docutils literal notranslate"><span class="pre">niwatoko</span></code> コマンドを使用して、自然言語のソースコードを直接実行することができます。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>niwatoko<span class="w"> </span>example.md<span class="w"> </span>-o<span class="w"> </span>example.py
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">example.md</span></code> ファイルに書かれた自然言語のソースコードが、中間生成ファイル <code class="docutils literal notranslate"><span class="pre">example.py</span></code> に変換されて実行されます。</p>
+<p>モデルの選択は以下のオプションで行えます:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">-m</span></code> または <code class="docutils literal notranslate"><span class="pre">--model</span></code>: 使用するモデルを選択します。デフォルトは <code class="docutils literal notranslate"><span class="pre">claude-haiku</span></code> です。
+選択可能なモデル:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">openai-gpt4o</span></code> .</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">claude-sonnet</span></code> .</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">claude-opus</span></code> .</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">claude-haiku</span></code> .</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gemini-1.5-pro</span></code> .</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gemini-1.5-flash</span></code> .</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-mii</span></code> または <code class="docutils literal notranslate"><span class="pre">--model-input-image</span></code>: 使用する画像解釈モデルを選択します。デフォルトは <code class="docutils literal notranslate"><span class="pre">openai-gpt4o</span></code> です。
+選択可能なモデル:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">openai-gpt4o</span></code> .</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gemini-1.5-pro</span></code> .</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gemini-1.5-flash</span></code> .</p></li>
+</ul>
+</li>
+</ul>
+<p>例えば、以下のようにモデルを指定して実行できます:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>niwatoko<span class="w"> </span>example.md<span class="w"> </span>-m<span class="w"> </span>openai<span class="w"> </span>-mii<span class="w"> </span>gemini-1.5-pro<span class="w"> </span>-o<span class="w"> </span>example.py
+</pre></div>
+</div>
+</li>
+</ul>
+<dl>
+<dt>&lt;!– - インタプリタモード: 2つの使い方があります。</dt><dd><ol class="arabic">
+<li><p><code class="docutils literal notranslate"><span class="pre">niwatoko</span></code> コマンドを単独で実行すると、Pythonのようにインタプリタの画面が表示されます。ここで自然言語の命令を入力し、対話的にプログラムを実行できます。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>niwatoko
 niwatoko&gt;<span class="w"> </span><span class="s2">&quot;Hello, World!&quot;</span><span class="w"> </span>を表示してください
 Hello,<span class="w"> </span>World!
 niwatoko&gt;
 </pre></div>
 </div>
-</div></blockquote>
-<ol class="arabic" start="2">
+</li>
 <li><p><code class="docutils literal notranslate"><span class="pre">niwatoko</span> <span class="pre">&quot;プロンプト&quot;</span></code> のように、コマンドライン引数としてプロンプトを渡すことで、その回答を直接出力することもできます。</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>niwatoko<span class="w"> </span><span class="s2">&quot;&quot;</span>Hello,<span class="w"> </span>World!<span class="s2">&quot; を表示してください&quot;</span>
 Hello,<span class="w"> </span>World!
 </pre></div>
 </div>
-<p>これにより、自然言語の命令がPythonコードに変換され、その場で実行されます。実行結果は標準出力に表示されます。</p>
+<p>これにより、自然言語の命令がPythonコードに変換され、その場で実行されます。実行結果は標準出力に表示されます。 –&gt;</p>
 </li>
 </ol>
-</li>
-<li><p>コンパイラモード: <code class="docutils literal notranslate"><span class="pre">niwatoko</span></code> コマンドを使用して、自然言語のソースコードを直接実行することができます。</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>niwatoko<span class="w"> </span>example.md
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">example.md</span></code> ファイルに書かれた自然言語のソースコードが、そのまま実行されます。コンパイル済みのPythonコードを生成せずに、直接niwatokoで実行できるので便利です。</p>
-</li>
-</ul>
+</dd>
+</dl>
 </li>
 <li><p>niwatokoは、Pythonの代替品として使用できる自然言語プログラミング言語です。Pythonと同等の機能を提供しつつ、より直感的で読みやすいコードを書くことができます。以下に、簡単なものから少し複雑なものまで、niwatokoの完全自然言語プログラムの例を示します。</p>
 <div class="highlight-md notranslate"><div class="highlight"><pre><span></span>&quot;Hello, World!&quot; を表示する
@@ -115,14 +155,14 @@ Hello,<span class="w"> </span>World!
 </div>
 <p>上記の例は、Hello Worldから素数判定まで、Markdownで書かれた完全自然言語プログラムです。Markdownを使うことで、プログラミングの基本概念を自然言語で表現でき、初心者にもわかりやすいコードを書くことができます。</p>
 <p>これらのMarkdownプログラムを実行すると、以下のような結果が得られます。</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>niwatoko<span class="w"> </span>hello_world.md
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>niwatoko<span class="w"> </span>hello_world.md<span class="w"> </span>-o<span class="w"> </span>hello_world.py
 Hello,<span class="w"> </span>World!
 
-$<span class="w"> </span>niwatoko<span class="w"> </span>greeting.md
+$<span class="w"> </span>niwatoko<span class="w"> </span>greeting.md<span class="w"> </span>-o<span class="w"> </span>greeting.py
 名前を入力してください:<span class="w"> </span>山田
 こんにちは、山田さん！
 
-$<span class="w"> </span>niwatoko<span class="w"> </span>fibonacci.md
+$<span class="w"> </span>niwatoko<span class="w"> </span>fibonacci.md<span class="w"> </span>-o<span class="w"> </span>fibonacci.py
 <span class="m">1</span><span class="w"> </span>番目のフィボナッチ数は<span class="w"> </span><span class="m">1</span>
 <span class="m">2</span><span class="w"> </span>番目のフィボナッチ数は<span class="w"> </span><span class="m">1</span>
 <span class="m">3</span><span class="w"> </span>番目のフィボナッチ数は<span class="w"> </span><span class="m">2</span>
@@ -134,16 +174,18 @@ $<span class="w"> </span>niwatoko<span class="w"> </span>fibonacci.md
 <span class="m">9</span><span class="w"> </span>番目のフィボナッチ数は<span class="w"> </span><span class="m">34</span>
 <span class="m">10</span><span class="w"> </span>番目のフィボナッチ数は<span class="w"> </span><span class="m">55</span>
 
-$<span class="w"> </span>niwatoko<span class="w"> </span>prime_number.md
+$<span class="w"> </span>niwatoko<span class="w"> </span>prime_number.md<span class="w"> </span>-o<span class="w"> </span>prime_number.py
 数値を入力してください:<span class="w"> </span><span class="m">17</span>
 <span class="m">17</span><span class="w"> </span>は素数です
 
-$<span class="w"> </span>niwatoko<span class="w"> </span>prime_number.md
+$<span class="w"> </span>niwatoko<span class="w"> </span>prime_number.md<span class="w"> </span>-o<span class="w"> </span>prime_number.py
 数値を入力してください:<span class="w"> </span><span class="m">24</span>
 <span class="m">24</span><span class="w"> </span>は素数ではありません
 </pre></div>
 </div>
 </li>
+</ol>
+<ol class="arabic simple" start="4">
 <li><p>応用編</p></li>
 </ol>
 <p>以下はグリモワール生成式になります。</p>
@@ -221,22 +263,20 @@ $<span class="w"> </span>niwatoko<span class="w"> </span>prime_number.md
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="requirements.html">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">niwatoko 言語のインストール方法</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">niwatoko 言語の使用方法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">インストール方法</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">使用方法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">歴史</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
-<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
-<li class="toctree-l1"><a class="reference internal" href="aaa.html">niwatoko 言語のインストール方法</a></li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="installation.html" title="previous chapter">niwatoko 言語のインストール方法</a></li>
-      <li>Next: <a href="modules.html" title="next chapter">Modules</a></li>
+      <li>Previous: <a href="installation.html" title="previous chapter">インストール方法</a></li>
+      <li>Next: <a href="history.html" title="next chapter">歴史</a></li>
   </ul></li>
 </ul>
 </div>

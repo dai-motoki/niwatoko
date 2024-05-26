@@ -1,4 +1,4 @@
-niwatoko 言語のインストール方法
+インストール方法
 ============================================
 
 niwatoko 言語は、以下の方法でインストールできます。
@@ -145,7 +145,7 @@ Dockerを使用する
 
    .. code-block:: dockerfile
 
-      FROM python:3.9
+      FROM python:3.10
       
       RUN pip install niwatoko
       
