@@ -9,8 +9,12 @@ with open(f"{niwatoko_dir}/grammar/system.md", "r", encoding = "utf-8") as f:
     system_prompt = f.read()
 
 
+api_key = os.environ.get("OPENAI_API_KEY")
+if not api_key:
+    raise openai.OpenAIError("api_keyクライアントオプションは、クライアントにapi_keyを渡すか、OPENAI_API_KEY環境変数を設定することで設定する必要があります。詳細は以下のURLでOpenAI API KEYをセットしてください: https://platform.openai.com/api-keys")
+
 client = OpenAI(
-    api_key=os.environ.get("OPENAI_API_KEY")
+    api_key=api_key
 )
 def generate_response(model, prompt, max_tokens, temperature):
     """
