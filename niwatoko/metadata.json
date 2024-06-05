@@ -1,0 +1,13 @@
+
+{
+    "name": "foundation_model",
+    "version": "0.1.0",
+    "language": "python",
+    "description": "OpenAI, Anthropic, Geminiの基盤モデル定義書",
+    "category": "ai",
+    "tags": [
+      "tool",
+      "ai"
+    ]
+  }
+

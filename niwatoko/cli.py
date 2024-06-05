@@ -655,41 +655,41 @@ def recognize_image_text_gemini(model, image_path):
 
 #     return generated_text
 
-# def generate_gemini_response(model, prompt):
-#     """
-#     Geminiモデルを使用してテキストを生成する関数
+def generate_gemini_response(model, prompt):
+    """
+    Geminiモデルを使用してテキストを生成する関数
 
-#     Returns:
-#         str: 生成されたテキスト
-#     """
-#     model = initialize_gemini_model(model)
+    Returns:
+        str: 生成されたテキスト
+    """
+    model = initialize_gemini_model(model)
 
-#     responses = model.generate_content(
-#         [prompt],
-#         generation_config=generation_config,
-#         safety_settings=safety_settings,
-#         stream=True,
-#     )
+    responses = model.generate_content(
+        [prompt],
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        stream=True,
+    )
 
-#     generated_text = ""
-#     for response in responses:
-#         generated_text += response.text
+    generated_text = ""
+    for response in responses:
+        generated_text += response.text
 
-#     return generated_text
+    return generated_text
 
-# # 共通設定
-# generation_config = {
-#     "max_output_tokens": 8192,
-#     "temperature": 1,
-#     "top_p": 0.95,
-# }
+# 共通設定
+generation_config = {
+    "max_output_tokens": 8192,
+    "temperature": 1,
+    "top_p": 0.95,
+}
 
-# safety_settings = {
-#     generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-#     generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-#     generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-#     generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-# }
+safety_settings = {
+    generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_NONE,
+    generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_NONE,
+    generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_NONE,
+    generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_NONE,
+}
 
 if __name__ == "__main__":
     main()
