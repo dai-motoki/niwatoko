@@ -12,7 +12,7 @@ import sys
 import time
 import base64
 import vertexai
-from vertexai.generative_models import GenerativeModel, Part, FinishReason
+from vertexai.generative_models import GenerativeModel, Part
 import vertexai.preview.generative_models as generative_models
 import requests
 # OpenAI API Key
@@ -93,29 +93,33 @@ def main():
                 file.write(code_content)  # 抽出したコードをファイルに書き込む
                 print(f"生成されたコードを {output} に書き出しました。")
                 print(f"Generated code has been written to {output}.")
-                print("生成されたコードを実行します。")  # 生成されたコードを実行する旨を表示
-                exec_globals = {}  # 実行環境のグローバル変数を初期化
-                exec_locals = {}  # 実行環境のローカル変数を初期化
-            try:
-                exec(code_content, exec_globals, exec_locals)  # execを使用して生成されたコードを実行
-                print("生成されたコードの実行が成功しました。")  # 実行成功のメッセージを表示
-                break  # 成功した場合、ループを抜ける
-            except Exception as e:
-                print("生成されたコードの実行に失敗しました。")  # 実行失敗のメッセージを表示
-                print("エラー:", str(e))  # エラーメッセージを表示
-                # エラー要因を想定してテキストで出力
-                error_analysis = generate_code(
-                    model=model,
-                    content=f"以下のエラーが発生しました。考えられる要因を分析してください。\n\nエラー: {str(e)}"
-                )
-                print("エラー要因の分析結果:", error_analysis)
-                user_input = input("エラーが発生しました。自動修正を試みますか？ (y/n): ")  # 自動修正を試みるかユーザーに確認
-                if user_input.lower() == 'y':
-                    # エラー要因の分析結果をプロンプトに追加
-                    processed_content += f"\n# エラーが出ました。修正してください: {str(e)}\n# エラー要因の分析:\n{error_analysis}"
-                else:
-                    print("自動修正をスキップします。")  # 自動修正をスキップする旨を表示
 
+                # 拡張子がpyの場合のみコードを実行
+                if output.endswith('.py'):
+                    print("生成されたコードを実行します。")  # 生成されたコードを実行する旨を表示
+                    exec_globals = {}  # 実行環境のグローバル変数を初期化
+                    exec_locals = {}  # 実行環境のローカル変数を初期化
+                    try:
+                        exec(code_content, exec_globals, exec_locals)  # execを使用して生成されたコードを実行
+                        print("生成されたコードの実行が成功しました。")  # 実行成功のメッセージを表示
+                        break  # 成功した場合、ループを抜ける
+                    except Exception as e:
+                        print("生成されたコードの実行に失敗しました。")  # 実行失敗のメッセージを表示
+                        print("エラー:", str(e))  # エラーメッセージを表示
+                        # エラー要因を想定してテキストで出力
+                        error_analysis = generate_code(
+                            model=model,
+                            content=f"以下のエラーが発生しました。考えられる要因を分析してください。\n\nエラー: {str(e)}"
+                        )
+                        print("エラー要因の分析結果:", error_analysis)
+                        user_input = input("エラーが発生しました。自動修正を試みますか？ (y/n): ")  # 自動修正を試みるかユーザーに確認
+                        if user_input.lower() == 'y':
+                            # エラー要因の分析結果をプロンプトに追加
+                            processed_content += f"\n# エラーが出ました。修正してください: {str(e)}\n# エラー要因の分析:\n{error_analysis}"
+                        else:
+                            print("自動修正をスキップします。")  # 自動修正をスキップする旨を表示
+                else:
+                    break  # Python以外の場合、ループを抜ける
 
 def print_usage():
     """
@@ -206,11 +210,10 @@ def process_imports(file_path, model_input_image):
             parts = line.strip().split(' = ')
             if len(parts) == 2:
                 import_path = parts[1].strip()
-                # print('import_path:', import_path)
                 if '[' in import_path and not import_path.startswith('['):
                     # ブラケットで囲まれたパスを抽出
                     path_within_brackets = import_path[1:-1]
-                    # print("ブラケット内のパス:", path_within_brackets)  # デバッグ用print
+                    print("ブラケット内のパス:", path_within_brackets)  # デバッグ用print
                     # 拡張子を取得
                     extension = path_within_brackets.split('.')[-1]
                     # print("拡張子:", extension)  # デバッグ用print
@@ -231,10 +234,21 @@ def process_imports(file_path, model_input_image):
                         output.extend(process_other_import(import_path, line))
                 elif import_path.startswith('[') and import_path.endswith(']'):
                     # ブラケットで囲まれたパスを抽出
-                    path_within_brackets = import_path[1:-1]
-                    # print("ブラケット内のパス:", path_within_brackets)  # デバッグ用print
+                    import_path = import_path[1:-1]
+                    print("ブラケット内のパス:", import_path)  # デバッグ用print
+
+                    # パスが存在するか確認
+                    if not os.path.exists(import_path):
+                        # パスが存在しない場合、新しいパスを設定
+                        package_first_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                        print("パッケージの最上位ディレクトリ:", package_first_dir)  # デバッグ用print
+                        import_path = os.path.join(package_first_dir, f'grimo/grimoires/{import_path}')
+                        if not os.path.exists(import_path):
+                            raise FileNotFoundError(
+                                f"\033[91m{import_path} が見つかりません。\ngrimo install package_name -v version でインストールしてください。\033[0m"
+                            )
                     # 拡張子を取得
-                    extension = path_within_brackets.split('.')[-1]
+                    extension = import_path.split('.')[-1]
                     # print("拡張子:", extension)  # デバッグ用print
                     if extension in ['png', 'jpg', 'jpeg', 'gif']:
                         output.extend(process_image_import(import_path, model_input_image, line))
@@ -284,7 +298,7 @@ def process_no_extension_import(import_path, line):
     Returns:
         list: 処理後の出力行のリスト
     """
-    import_path = import_path[1:-1]
+    # import_path = import_path[1:-1]
     import_content = get_file_content(import_path)
     return [line, '```\n', import_content, '```\n']
 
@@ -361,7 +375,7 @@ def process_image_import(import_path, model_input_image, line):
     Returns:
         list: 処理後の出力行のリスト
     """
-    import_path = import_path[1:-1]
+    # import_path = import_path[1:-1]
     if model_input_image == 'openai-gpt4o':
         recognized_text = recognize_image_text_gpt4o(import_path)
     elif model_input_image in ['gemini-1.5-pro', 'gemini-1.5-flash']:
@@ -382,7 +396,7 @@ def process_video_import(import_path, model_input_image, line):
         list: 処理後の出力行のリスト
     """
 
-    import_path = import_path[1:-1]
+    # import_path = import_path[1:-1]
     if model_input_image == 'openai-gpt4o':
         recognized_text = recognize_video_text_gpt4o(import_path)
     elif model_input_image in ['gemini-1.5-pro', 'gemini-1.5-flash']:
@@ -685,10 +699,10 @@ generation_config = {
 }
 
 safety_settings = {
-    generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_NONE,
-    generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_NONE,
-    generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_NONE,
-    generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_NONE,
+    generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+    generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
 }
 
 if __name__ == "__main__":
