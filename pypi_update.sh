@@ -1,4 +1,4 @@
+# pip install wheel
 python setup.py sdist bdist_wheel
-twine upload dist/niwatoko-1.2.11*
-# twine upload dist/grimo-0.0.1*
-
+twine upload dist/grimo-1.2.14*
+git add . && git commit -m "Release v1.2.14" && git push && git tag v1.2.14 && git push --tags
