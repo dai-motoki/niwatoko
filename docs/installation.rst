@@ -72,7 +72,7 @@ Macの場合
 Windowsの場合
 ~~~~~~~~~~~~~
 
-1. Pythonの公式サイト（https://www.python.org/downloads/）から、Python 3.6以上のインストーラをダウンロードします。
+1. Pythonの公式サイト（ https://www.python.org/downloads/ ）から、Python 3.6以上のインストーラをダウンロードします。
 
 2. ダウンロードしたインストーラを実行し、Pythonをインストールします。インストール時に「Add Python to PATH」オプションを選択することを推奨します。
 
@@ -116,9 +116,7 @@ Windowsの場合
 
 2. 仮想環境をアクティベートします。
 
-   Macの場合
-   
-   :
+   Macの場合:
 
    .. code-block:: shell
 
